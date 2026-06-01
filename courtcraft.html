@@ -1,0 +1,2313 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#060d18;">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CourtCraft — Smart Practice Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+html,body{background:#060d18 !important;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#060d18 !important;color:#f1f5f9;font-family:'IBM Plex Sans','Segoe UI',sans-serif;min-height:100vh;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:#0f172a;}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px;}
+input,textarea,select{background:#1e293b;border:1px solid #334155;border-radius:6px;color:#f1f5f9;padding:8px 10px;font-size:13px;font-family:inherit;width:100%;outline:none;box-sizing:border-box;}
+select option{background:#1e293b;}
+textarea{resize:vertical;}
+button{cursor:pointer;font-family:inherit;border:none;}
+.btn{border-radius:5px;padding:4px 10px;font-size:11px;color:#fff;transition:opacity .15s;}
+.btn:hover{opacity:.85;}
+h1,h2,h3,.condensed{font-family:'Barlow Condensed',sans-serif;letter-spacing:.03em;}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.divider{border-top:1px solid #1e293b;margin:16px 0;}
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-bottom:8px;transition:border-color .2s;}
+.card:hover{border-color:rgba(232,119,34,.35);}
+.section-bar{width:3px;height:16px;background:#e87722;border-radius:2px;display:inline-block;margin-right:8px;vertical-align:middle;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.span2{grid-column:span 2;}
+.label{display:block;color:#64748b;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;}
+.form-box{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:16px;}
+.empty-state{text-align:center;padding:48px 20px;color:#334155;}
+.empty-state .icon{font-size:40px;margin-bottom:12px;}
+.tab-btn{background:none;border:none;color:#475569;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px 13px;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+.tab-btn.active{color:#e87722;border-bottom-color:#e87722;}
+.toggle-row{display:flex;gap:6px;flex-wrap:wrap;}
+.toggle-btn{border-radius:5px;padding:5px 12px;font-size:11px;color:#fff;background:#1e293b;border:none;cursor:pointer;transition:background .15s;}
+.warn-box{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22);border-radius:8px;padding:10px 14px;margin-top:12px;}
+.plan-section{margin-bottom:18px;}
+.plan-section-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.info-bar{background:rgba(232,119,34,.06);border:1px solid rgba(232,119,34,.2);border-radius:8px;padding:8px 12px;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<div id="app" style="background:#060d18;min-height:100vh;"></div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const STORAGE_PREFIX = 'cc_';
+const save = (k,v) => localStorage.setItem(STORAGE_PREFIX+k, JSON.stringify(v));
+const load = (k,d) => { try{ const v=localStorage.getItem(STORAGE_PREFIX+k); return v?JSON.parse(v):d; }catch{return d;} };
+
+const DEFAULT_DRILLS = [
+  {id:"d1",name:"3v3 Half-Court (No Dribble)",source:"CLA / Sarama",ageMin:10,ageMax:18,levels:["beginner","intermediate","advanced"],duration:12,focus:["s6","s9","s12"],description:"Play 3v3: no dribbling until past half-court. Forces players to read spacing and move early.",coachingCues:["Find the open gap","Move before you catch","What do you see before the pass?"],format:"game",players:6,phase:"game"},
+  {id:"d2",name:"1v1 Live with Invitation",source:"CLA / Representative Practice",ageMin:8,ageMax:18,levels:["beginner","intermediate","advanced"],duration:8,focus:["s11","s6","s12"],description:"Defender gives an invitation (shows a lane). Attacker reads and reacts. Defender plays live after first move.",coachingCues:["Read the defender's feet","Commit to the gap","What did the defender give you?"],format:"game",players:2,phase:"game"},
+  {id:"d3",name:"4v4 Dribble Handoff Game",source:"ByAnyMeansCoaches",ageMin:12,ageMax:18,levels:["intermediate","advanced"],duration:15,focus:["s9","s6","s5"],description:"4v4 where a point scores for every successful DHO completed, plus basket scores.",coachingCues:["Shoulders to defender on DHO","Attack the gap immediately","Space the floor after"],format:"game",players:8,phase:"game"},
+  {id:"d4",name:"Mikan Drill",source:"Classic / Fundamental",ageMin:6,ageMax:14,levels:["beginner","intermediate"],duration:5,focus:["s1","s17"],description:"Alternating underhand layups each side without letting the ball touch the floor.",coachingCues:["High soft release","Land balanced","Keep rhythm"],format:"skill",players:1,phase:"skill"},
+  {id:"d5",name:"Shell Drill",source:"Fundamental / Defensive",ageMin:12,ageMax:18,levels:["intermediate","advanced"],duration:10,focus:["s13","s9","s16"],description:"4v4 perimeter passing. Defenders practice deny, help, and rotation positioning.",coachingCues:["Pistols on ball movement","Shrink on skip","Talk — call every pass"],format:"skill",players:8,phase:"skill"},
+  {id:"d6",name:"Chaos Dribbling",source:"CLA / Attentional Focus",ageMin:6,ageMax:12,levels:["beginner","intermediate"],duration:6,focus:["s5","s6"],description:"All players dribble in confined space. Coach gives tasks without stopping dribble.",coachingCues:["Eyes up","React — don't wait","Use your body to protect"],format:"game",players:6,phase:"warmup"},
+  {id:"d7",name:"2v2+2 Playmaker Game",source:"Sarama / Small-Sided",ageMin:10,ageMax:18,levels:["intermediate","advanced"],duration:12,focus:["s6","s9","s12"],description:"2v2 with 2 neutral sideline players as pass outlets. Offense keeps possession on made basket.",coachingCues:["Use neutrals to reset","Drive to collapse, kick out","Read the help"],format:"game",players:6,phase:"game"},
+  {id:"d8",name:"Form Shooting Progression",source:"Fundamental",ageMin:6,ageMax:14,levels:["beginner"],duration:8,focus:["s3","s17"],description:"Start 3 feet from basket. One-hand form shots. Progress back every 5 makes.",coachingCues:["Elbow under ball","Follow through","Feet shoulder-width"],format:"skill",players:1,phase:"skill"},
+  {id:"d9",name:"5v0 to 5v5 Transition",source:"Game-Based / Transition",ageMin:13,ageMax:18,levels:["intermediate","advanced"],duration:15,focus:["s9","s12","s6"],description:"Walk through offensive set 5v0, then immediately play live 5v5.",coachingCues:["Stretch defense","Play what you see","Communicate actions"],format:"game",players:10,phase:"game"},
+  {id:"d10",name:"Zig-Zag Defensive Footwork",source:"Fundamental / Defense",ageMin:8,ageMax:18,levels:["beginner","intermediate"],duration:6,focus:["s13","s17"],description:"Defender slides in zig-zag pattern. Low stance, lead foot direction, no crossing.",coachingCues:["Stay low","Lead foot points direction","Hands active"],format:"skill",players:1,phase:"warmup"},
+
+  // ── CLA Drills ──────────────────────────────────────────────────
+  {id:"d11",name:"Back Attack Finishing",source:"CLA / Breakthrough Basketball",ageMin:10,ageMax:18,levels:["intermediate","advanced"],duration:8,focus:["s1","s6"],description:"Attacker starts with back to basket, defender behind. Coach passes — attacker turns and finishes before defender recovers. Forces reading of defender position on the catch.",coachingCues:["Feel where the defender is before you catch","Attack the space they give you","Finish with body control — don't jump into contact"],format:"game",players:2,phase:"skill"},
+
+  {id:"d12",name:"3v3 Compressed Width",source:"CLA / Dr Dish Basketball",ageMin:12,ageMax:18,levels:["intermediate","advanced"],duration:12,focus:["s6","s10","s9"],description:"Play 3v3 using only 2/3 the court width marked by cones. Compressed space forces faster decision-making, sharper cuts, and precise passing angles under extreme pressure.",coachingCues:["Find the gap before it closes","Move before you catch — space is limited","Sharp cuts only — no drifting"],format:"game",players:6,phase:"game"},
+
+  {id:"d13",name:"Dribble Limit Game",source:"CLA / Breakthrough Basketball",ageMin:12,ageMax:18,levels:["intermediate","advanced"],duration:15,focus:["s6","s9","s10"],description:"4v4 or 5v5 with a maximum of 2 dribbles per player per possession. Forces ball movement, off-ball cuts, and reading the defense before catching. Progress to 3 dribbles as players improve.",coachingCues:["Decide before you catch — no wasted dribbles","Cut hard to create a passing angle","Read the defense — where is the advantage?"],format:"game",players:8,phase:"game"},
+
+  {id:"d14",name:"Advantage 3v2 Attack",source:"CLA / Basketball Immersion",ageMin:10,ageMax:18,levels:["beginner","intermediate","advanced"],duration:10,focus:["s6","s12","s16"],description:"Offense always starts 3 attackers vs 2 defenders. Forces defense to communicate and rotate; forces offense to identify and exploit the open man before defense recovers.",coachingCues:["Attack immediately — don't let defense set","Find the open man before help arrives","Defense: communicate who has ball"],format:"game",players:5,phase:"game"},
+
+  {id:"d15",name:"Shot Value Constraint",source:"CLA / Breakthrough Basketball",ageMin:12,ageMax:18,levels:["intermediate","advanced"],duration:15,focus:["s6","s3"],description:"3v3 or 4v4 with changed scoring: layups = 3pts, catch-and-shoot threes = 2pts, pull-up mid-range = 1pt, contested mid-range = 0pts. Players self-regulate shot selection based on quality.",coachingCues:["Is this a gold medal shot?","Pass up the 1-point shot for the 3-point shot","Attack the basket first — earn the layup"],format:"game",players:6,phase:"game"},
+
+  {id:"d16",name:"1v1 Full Court",source:"CLA / Basketball Immersion",ageMin:12,ageMax:18,levels:["intermediate","advanced"],duration:8,focus:["s11","s5","s15"],description:"1v1 from end line to end line, no help defenders. Forces attacker to use dribble moves, change of pace and reads at full speed. Defender must contain without fouling.",coachingCues:["Change speed — don't dribble at one pace","Protect the ball with your body","Defender: stay between ball and basket"],format:"game",players:2,phase:"game"},
+
+  {id:"d17",name:"Continuous 3v3 Transition",source:"CLA / Sarama",ageMin:13,ageMax:18,levels:["intermediate","advanced"],duration:15,focus:["s12","s6","s16"],description:"Two teams of 3. When a team scores or ball goes out, defending team immediately becomes attacking team — no reset. Forces constant transition reads, communication, and conditioning.",coachingCues:["Sprint — don't walk into transition","Call out numbers: 3v2 go!","First pass ahead, then read the numbers"],format:"game",players:6,phase:"game"},
+
+  {id:"d18",name:"Weak Hand Constraint",source:"CLA — Individual Constraint",ageMin:8,ageMax:18,levels:["beginner","intermediate","advanced"],duration:6,focus:["s2","s5"],description:"Apply to any ball-handling, finishing, or 1v1 drill: non-dominant hand only. Apply individually to players who rely on their strong hand. Not for beginners who haven't found either hand yet.",coachingCues:["Slow down — let the weak hand learn","Eyes up even when it feels uncomfortable","Don't reach across — stay square and attack straight"],format:"skill",players:1,phase:"skill"},
+
+  // ── Athleticism & Strength ──────────────────────────────────────
+  {id:"d19",name:"Box Jumps",source:"Strength & Conditioning",ageMin:12,ageMax:18,levels:["beginner","intermediate","advanced"],duration:8,focus:["s21","s24","s19"],description:"Jump onto a box (30–50cm), step down, reset, repeat. 3 sets of 8. Builds explosive leg power and safe landing mechanics. Progress to lateral box jumps for basketball-specific movement.",coachingCues:["Hips back on landing — absorb through the legs","Reset fully before each rep — this is power not cardio","Arms drive the jump — use them"],format:"skill",players:1,phase:"conditioning"},
+
+  {id:"d20",name:"Lateral Cone Shuttles",source:"Strength & Conditioning",ageMin:10,ageMax:18,levels:["beginner","intermediate","advanced"],duration:6,focus:["s22","s15"],description:"5 cones spaced 1m apart in a line. Sprint and touch each cone laterally and back. 4 sets of 30 seconds with full recovery between sets. Builds lateral quickness, change of direction, and first-step explosiveness.",coachingCues:["Low hips — stay in an athletic stance throughout","Push off the outside foot to change direction","Touch the cone — make it honest"],format:"skill",players:1,phase:"warmup"},
+
+  {id:"d21",name:"Depth Jumps",source:"Strength & Conditioning / Plyometrics",ageMin:14,ageMax:18,levels:["intermediate","advanced"],duration:10,focus:["s21","s24","s19"],description:"Step off a box, land, then immediately explode upward as high as possible. 3 sets of 6 with full recovery. Trains the stretch-shortening cycle — the key mechanism for improving reactive jumping ability.",coachingCues:["Minimal ground contact time — think hot coals","Land on the balls of your feet not your heels","The jump starts the moment you land — no pause"],format:"skill",players:1,phase:"conditioning"},
+
+  {id:"d22",name:"Single-Leg Romanian Deadlift",source:"Strength & Conditioning",ageMin:13,ageMax:18,levels:["beginner","intermediate","advanced"],duration:8,focus:["s23","s19","s22"],description:"Stand on one leg, hinge at the hip, reach toward the floor with the opposite hand, return to standing. 3 sets of 8 each side. Builds hamstring strength, hip stability and balance — critical for safe landing and change of direction.",coachingCues:["Flat back throughout — don't round","Feel the stretch in the standing hamstring","Hold a slight bend in the standing knee — don't lock out"],format:"skill",players:1,phase:"conditioning"},
+
+  {id:"d23",name:"Trap Bar Deadlift",source:"Strength & Conditioning / Garage Strength",ageMin:14,ageMax:18,levels:["intermediate","advanced"],duration:10,focus:["s21","s23","s19"],description:"Load a trap bar, stand inside it, drive through the floor to standing. 3 sets of 5 at moderate weight. Builds overall lower body and posterior chain strength — the foundation of basketball explosiveness.",coachingCues:["Chest up, drive the floor away — don't pull up","Engage the lats before the lift — protect the lower back","Stand tall at the top — hips fully locked out"],format:"skill",players:1,phase:"conditioning"},
+
+  {id:"d24",name:"Ankle Bounding",source:"Strength & Conditioning / Plyometrics",ageMin:12,ageMax:18,levels:["beginner","intermediate","advanced"],duration:6,focus:["s22","s21","s24"],description:"Rapid short hops forward on both feet using only the ankles — minimal knee bend. 4 sets of 20 metres with full recovery. Builds ankle stiffness and reactive strength — directly improves first-step quickness and jump power.",coachingCues:["Think of your ankles as springs — stiff and fast","Arms pump to help rhythm — keep them tight","Stay tall — don't lean forward"],format:"skill",players:1,phase:"warmup"},
+
+  {id:"d25",name:"Copenhagen Plank",source:"Strength & Conditioning / Injury Prevention",ageMin:13,ageMax:18,levels:["beginner","intermediate","advanced"],duration:6,focus:["s23","s19"],description:"Side plank with the top leg resting on a bench, bottom leg hanging. 3 sets of 30 seconds each side. Builds adductor (groin) strength — one of the most commonly injured muscle groups in basketball — and hip stability.",coachingCues:["Keep hips stacked — don't let the top hip drop back","Squeeze the glute of the working side","Progress by lifting the bottom leg off the floor"],format:"skill",players:1,phase:"cooldown"},
+];
+
+const CONCEPTS = [
+  {id:"c1",category:"Transition",icon:"⚡",title:"Primary & Secondary Break",summary:"Transition is the highest-value possession — defense is outnumbered and disorganised.",keyIdeas:["Sprint lanes wide to stretch the defense horizontally","Ball-pusher reads numbers: 2v1 attack, 3v2 pass ahead, even numbers slow down","Secondary break: attack before the fifth defender arrives","Triggers: made basket, rebound, turnover — push immediately"],teachingProgression:["3v0 half-court: walk through lane spacing and touch points","3v2 secondary break: live reads, finish or reset","5v5 live — award bonus points for transition baskets"],saramaRef:"Transforming Basketball — Ch. 4"},
+  {id:"c2",category:"Spacing",icon:"📐",title:"Floor Spacing Principles",summary:"Spacing creates driving lanes and help-side dilemmas. Good spacing means the defense can never guard two threats at once.",keyIdeas:["Five-out as default: all players above the arc unless cutting","Spacing rule: if your defender can help on a drive, you are too close","Corner spacing keeps weak-side help honest","Spacing is dynamic — when one cuts, another fills"],teachingProgression:["5v0 spacing walk-through: coach drives, players correct positions","4v4 constraint: defense scores if two offensive players are within 3 feet","5v5 with spacing score tracked alongside basket score"],saramaRef:"Transforming Basketball — Ch. 6"},
+  {id:"c3",category:"Shot Priorities",icon:"🥇",title:"Gold Medal Shots",summary:"A shot-quality framework. Not all shots are equal — develop a hierarchy that players use in live play.",keyIdeas:["Gold: layup or dunk from an offensive advantage — always take it","Silver: open catch-and-shoot from a spot the player has rehearsed","Bronze: mid-range or pull-up from a slight advantage","No medal: contested, off-balance — pass out","Framework: Is this better than what I could create next?"],teachingProgression:["Watch film together — classify every shot as gold/silver/bronze/no-medal","Shooting games where point values match the medal system","3v3 with post-possession debrief: What medal was that?"],saramaRef:"Transforming Basketball — Ch. 8"},
+  {id:"c4",category:"Screens",icon:"🧱",title:"Screen Actions & Reads",summary:"Screens are decision-making moments for both the screener and ball-handler — not choreography.",keyIdeas:["Ball screen: screener reads — pop if hedge, roll if defender goes under","Off-ball screen: curl if chasing, fade if fronting, straight cut if lost","The screener hunts advantages too — not just the ball-handler","Down screen: arrive late — early arrival gives the defender position","Stagger screen: user reads each defender separately"],teachingProgression:["2v0 then 2v2: walk the screen action, then play live","3v3 constraint: every possession must include a screen action","Film review: what did the defense give, did the offense take it?"],saramaRef:"Transforming Basketball — Ch. 10"},
+  {id:"c5",category:"Cuts",icon:"✂️",title:"Cutting Actions",summary:"Cutting is a response to what the defense gives — every cut is a read, not a pattern.",keyIdeas:["Basket cut: defender turns head or helps — go backdoor immediately","L-cut: set up defender high, cut sharp to catch low","Give-and-go: pass and read defender — if they watch the ball, cut","Timing is everything — a cut without a ready passer is wasted movement","Cutters read the defender, not the ball"],teachingProgression:["2v1 cutting game: cutter must read defender to score","3v3 live cuts only — no dribbling, all scoring via cut-and-catch","5v5 with verbal cue: cutter calls backdoor or L-cut to build language"],saramaRef:"Transforming Basketball — Ch. 10"},
+  {id:"c6",category:"Triggers & Actions",icon:"🎯",title:"Triggers, Actions & Dominoes",summary:"Offense flows from triggers (reads) to actions (responses) to dominoes (chain reactions). Every great offensive play starts with a player reading a defensive mistake.",keyIdeas:["Trigger: a defensive condition that creates an opportunity","Action: the immediate response to the trigger","Domino: the chain of advantages the action creates downstream","Teach players to see two moves ahead: if I drive here, what does that open?","Randomise practice environments so players learn to find triggers","Examples of Triggers → Actions → Dominoes:\n• Trigger: help defender cheats toward the ball / Action: backdoor cut / Domino: layup, or if help rotates → corner three opens\n• Trigger: defender goes under a ball screen / Action: pull-up jumper off the screen / Domino: if defender adjusts to go over → drive opens on the next screen\n• Trigger: closeout defender is off-balance / Action: one dribble drive / Domino: help rotates from weak side → skip pass to corner shooter\n• Trigger: post defender fronts / Action: lob pass over the top / Domino: weak-side help collapses → kick out to wing three\n• Trigger: on-ball defender ball-watches after a pass / Action: give-and-go cut / Domino: if help comes → second cutter is open"],teachingProgression:["3v3 find the trigger — coach pauses and asks what is the trigger right now?","Video analysis: identify trigger, action, and domino chains in game footage","5v5: offense must verbalise the trigger before acting"],saramaRef:"Transforming Basketball — Ch. 7"},
+  {id:"c7",category:"Defense",icon:"🛡️",title:"Defensive Principles",summary:"Players who understand why they are in a position make better decisions than those following a system.",keyIdeas:["Ball pressure always first — no free catches, no free dribbles","Help-side: see ball and man — never watch only your own player","Closeout: sprint then chop — arrive under control to take away the drive","Communication is defense — silence means guessing","Funnel drives into help, not baseline"],teachingProgression:["Shell drill: stationary passing, then add movement, then live","1v1 closeout drill with live play after","5v5 defensive communication score: a point per loud correct call"],saramaRef:"Transforming Basketball — Ch. 12"},
+  {id:"c8",category:"Decision Making",icon:"🧠",title:"Offensive Advantages",summary:"Basketball is a game of advantages. Teach players to see, create, and exploit them — not run plays.",keyIdeas:["Numerical: more attackers than defenders in an area — attack immediately","Positional: attacker in a space where the defender cannot recover in time","Momentum: attacker moving, defender static — attack before they set","Teach scanning: before the catch, what do you see?","Reduce play-calling — let players find advantages. Ask what did you see, not why didn't you run it"],teachingProgression:["3v3 name the advantage — players must identify before shooting","Constraints games that force advantage-seeking, no set plays","Post-session debrief: What was the best advantage you found today?"],saramaRef:"Transforming Basketball — Ch. 5"},
+];
+
+// ── These are now dynamic — read from settings ───────────────────────────────
+const LEVEL_COLORS={beginner:"#22c55e",intermediate:"#f97316",advanced:"#ef4444"};
+const CAT_COLORS={Transition:"#e87722",Spacing:"#3b82f6","Shot Priorities":"#f59e0b",Screens:"#8b5cf6",Cuts:"#10b981","Triggers & Actions":"#ef4444",Defense:"#64748b","Decision Making":"#06b6d4"};
+
+// Default settings — overridden by user's saved settings
+const DEFAULT_SETTINGS = {
+  levels: ["beginner","intermediate","advanced"],
+  // focusOptions removed — skills are now the single source of truth
+  // Skills: {id, label} — one unified object used on drills and player profiles
+  skills: [
+    {id:"s1",  label:"Finishing at rim"},
+    {id:"s2",  label:"Weak hand finishing"},
+    {id:"s3",  label:"Shooting"},
+    {id:"s4",  label:"Free throws"},
+    {id:"s5",  label:"Ball handling"},
+    {id:"s6",  label:"Decision making"},
+    {id:"s7",  label:"Court vision"},
+    {id:"s8",  label:"Reading screens"},
+    {id:"s9",  label:"Off-ball movement"},
+    {id:"s10", label:"Spacing"},
+    {id:"s11", label:"1v1 attacking"},
+    {id:"s12", label:"Transition offense"},
+    {id:"s13", label:"Defense"},
+    {id:"s14", label:"Closeout technique"},
+    {id:"s15", label:"Defensive footwork"},
+    {id:"s16", label:"Communication"},
+    {id:"s17", label:"Footwork / pivoting"},
+    {id:"s18", label:"Leadership"},
+    {id:"s19", label:"Athleticism"},
+    {id:"s20", label:"IQ / reads"},
+    {id:"s21", label:"Explosiveness"},
+    {id:"s22", label:"Speed & agility"},
+    {id:"s23", label:"Core strength"},
+    {id:"s24", label:"Vertical jump"},
+  ],
+};
+
+// Live getters — always read from current settings
+function getSettings() { return state.settings || DEFAULT_SETTINGS; }
+function LEVEL_OPTIONS(){ return getSettings().levels; }
+function FOCUS_OPTIONS(){ return SKILLS().map(s=>s.id); } // compat — returns skill ids
+function ATTRIBUTES()   { return getSettings().skills || DEFAULT_SETTINGS.skills; } // legacy compat
+function SKILLS()       { return getSettings().skills || DEFAULT_SETTINGS.skills; }
+// drill.focus is an array of skill ids — this just returns it directly
+function drillFocusTags(drill) { return drill.focus||[]; }
+// Resolve skill id to label for display
+function skillLabel(id) {
+  const s = SKILLS().find(sk => sk.id === id);
+  return s ? s.label : id;
+}
+function noteCatColor(c){ const cols={Strength:"#22c55e",Weakness:"#ef4444",Technical:"#3b82f6",Tactical:"#8b5cf6",Mental:"#f59e0b","Focus Area":"#e87722"}; return cols[c]||"#64748b"; }
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let state = {
+  tab: 'plan',
+  drills: load('drills', DEFAULT_DRILLS),
+  favorites: load('favorites', []),
+  players: load('players', []),
+  teams: load('teams', []),
+  sessions: load('sessions', []),
+  // sub-views
+  playerView: 'list', selectedPlayer: null, playerForm: null,
+  teamView: 'list', selectedTeam: null, teamForm: null, pickingPlayers: false,
+  libSearch: '', libLevel: '', libFocus: '',
+  showDrillForm: false, editDrill: null,
+  conceptSelected: null, conceptFilter: '',
+  // plan builder — 3-step wizard
+  planStep: 1,
+  planMode: 'general', planTeamId: '', planPlayerIds: [],
+  planAge: 12, planLevel: 'intermediate', planDuration: 60,
+  planFocus: [], planPlayerCount: 10,
+  generatedPlan: null, planSaved: false,
+  planSessionType: 'full',
+  // settings
+  settings: load('settings', DEFAULT_SETTINGS),
+  settingsSection: 'attributes',
+};
+
+// ── Migration: merge any new default drills/skills into saved state ───────────
+const DATA_VERSION = 4; // bump this whenever DEFAULT_DRILLS or DEFAULT_SETTINGS.skills changes
+(function migrate() {
+  const savedVersion = parseInt(localStorage.getItem('cc_dataVersion') || '0');
+  if (savedVersion >= DATA_VERSION) return;
+
+  // Merge new default drills (add any that don't exist in saved drills)
+  const savedDrillIds = new Set(state.drills.map(d => d.id));
+  const newDrills = DEFAULT_DRILLS.filter(d => !savedDrillIds.has(d.id));
+  if (newDrills.length > 0) {
+    state.drills = [...state.drills, ...newDrills];
+    save('drills', state.drills);
+  }
+
+  // Merge new default skills (add any that don't exist in saved settings)
+  const savedSettings = state.settings || DEFAULT_SETTINGS;
+  const savedSkillIds = new Set((savedSettings.skills || []).map(s => s.id));
+  const newSkills = DEFAULT_SETTINGS.skills.filter(s => !savedSkillIds.has(s.id));
+  if (newSkills.length > 0) {
+    savedSettings.skills = [...(savedSettings.skills || []), ...newSkills];
+    state.settings = {...savedSettings};
+    save('settings', state.settings);
+  }
+
+  localStorage.setItem('cc_dataVersion', DATA_VERSION);
+})();
+
+function persist() {
+  save('drills', state.drills);
+  save('favorites', state.favorites);
+  save('players', state.players);
+  save('teams', state.teams);
+  save('sessions', state.sessions);
+  save('settings', state.settings);
+}
+
+function setState(updates) {
+  Object.assign(state, updates);
+  render();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function uid(prefix='id') { return prefix + Date.now() + Math.random().toString(36).slice(2,6); }
+function today() { return new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}); }
+function badge(label, color) {
+  return `<span class="badge" style="background:${color}22;color:${color};border:1px solid ${color}44">${label}</span>`;
+}
+function btn(label, bg, onclick, extra='') {
+  return `<button class="btn" style="background:${bg}" onclick="${onclick}" ${extra}>${label}</button>`;
+}
+function levelBadge(l) { return badge(l, LEVEL_COLORS[l]||'#64748b'); }
+function noteCatColor(c) { return NOTE_CAT_COLORS[c]||'#64748b'; }
+
+// ── Plan Generator (weakness-aware) ──────────────────────────────────────────
+const FOCUS_KEYWORD_MAP = {
+  'finish':'finishing','layup':'finishing','layups':'finishing',
+  'shoot':'shooting','shot':'shooting','three':'shooting','free throw':'shooting',
+  'dribble':'ball-handling','handle':'ball-handling','weak hand':'ball-handling',
+  'decision':'decision-making','read':'decision-making','iq':'decision-making','turnover':'decision-making',
+  'space':'spacing','spacing':'spacing',
+  'defense':'defense','defend':'defense','closeout':'defense',
+  'footwork':'footwork','pivot':'footwork',
+  'communication':'communication','talk':'communication',
+  'attack':'attacking','drive':'attacking','transition':'attacking',
+  '1v1':'1v1','one on one':'1v1',
+};
+
+function extractWeaknesses() {
+  const { planMode, planTeamId, planPlayerIds, players, teams } = state;
+  let contextLabel = 'General Group';
+  let rawWeaknesses = [];
+  let notesContext = [];
+
+  const notesToSkillIds = (notes) => {
+    const ids = new Set();
+    notes.forEach(n => {
+      // Skill rating — only weaknesses drive drill matching
+      if (n._skill && n.rating === 'weakness') {
+        ids.add(n._skill);
+        return;
+      }
+      // Free-text weakness notes — match skill label keywords to skill ids
+      if (n.category === 'Weakness' || n.category === 'Focus Area') {
+        const text = (n.title + ' ' + (n.content||'')).toLowerCase();
+        SKILLS().forEach(s => { if (text.includes(s.label.toLowerCase())) ids.add(s.id); });
+      }
+    });
+    return [...ids];
+  };
+
+  if (planMode === 'team') {
+    const t = teams.find(x => x.id === planTeamId);
+    if (t) {
+      contextLabel = t.name;
+      (t.notes||[]).forEach(n => {
+        notesContext.push('['+n.category+'] '+n.title+(n.content?': '+n.content:''));
+        if ((n._skill && n.rating==='weakness') || n.category === 'Weakness' || n.category === 'Focus Area') rawWeaknesses.push({source:t.name,...n});
+      });
+      players.filter(p => t.playerIds?.includes(p.id)).forEach(p => {
+        (p.notes||[]).forEach(n => {
+          notesContext.push(p.name+': ['+n.category+'] '+n.title+(n.content?': '+n.content:''));
+          if ((n._skill && n.rating==='weakness') || n.category === 'Weakness' || n.category === 'Focus Area') rawWeaknesses.push({source:p.name,...n});
+        });
+      });
+    }
+  } else if (planMode === 'players' && planPlayerIds.length > 0) {
+    const sps = players.filter(p => planPlayerIds.includes(p.id));
+    contextLabel = sps.map(p => p.name).join(', ');
+    sps.forEach(p => {
+      (p.notes||[]).forEach(n => {
+        notesContext.push(p.name+': ['+n.category+'] '+n.title+(n.content?': '+n.content:''));
+        if (n.category === 'Weakness' || n.category === 'Focus Area') rawWeaknesses.push({source:p.name,...n});
+      });
+    });
+  }
+
+  const skillIds = notesToSkillIds(rawWeaknesses);
+  return { skillIds, rawWeaknesses, contextLabel, notesContext };
+}
+
+function generatePlan() {
+  const { planAge, planLevel, planDuration, planFocus, planPlayerCount, planSessionType, drills } = state;
+  const sessionType = planSessionType || 'full';
+  const { skillIds, rawWeaknesses, contextLabel, notesContext } = extractWeaknesses();
+  const allSkillIds = [...new Set([...planFocus, ...skillIds])];
+
+  // ── Session type configs ──────────────────────────────────────────────────
+  const SESSION_TYPES = {
+    full: {
+      label: 'Full Session',
+      sections: [
+        { title:'Warm-Up / Activation',  pct:0.15, phases:['warmup','skill'],         drillCount:1, note:'Get players moving and mentally engaged.' },
+        { title:'Skill Development',     pct:0.25, phases:['skill'],                   drillCount:2, note:null },
+        { title:'Main Game',             pct:0.45, phases:['game'],                    drillCount:2, note:'Apply skills under game pressure. Minimise stoppages.' },
+        { title:'Cool Down / Reflection',pct:0.15, phases:['cooldown','skill'],        drillCount:1, note:'Ask: What weakness did you work on today?' },
+      ]
+    },
+    game: {
+      label: 'Game-Based',
+      sections: [
+        { title:'Warm-Up / Activation',  pct:0.15, phases:['warmup','skill'],         drillCount:1, note:'Quick activation — get competitive immediately.' },
+        { title:'Game 1',                pct:0.35, phases:['game'],                    drillCount:1, note:'First game constraint — focus on the session theme.' },
+        { title:'Game 2',                pct:0.35, phases:['game'],                    drillCount:2, note:'Progress the constraint or raise the stakes.' },
+        { title:'Cool Down / Reflection',pct:0.15, phases:['cooldown','skill'],        drillCount:1, note:'What trigger did you find most today?' },
+      ]
+    },
+    skills: {
+      label: 'Skills Focus',
+      sections: [
+        { title:'Warm-Up / Activation',  pct:0.15, phases:['warmup','skill'],         drillCount:1, note:'Specific activation — prepare the skill you are about to train.' },
+        { title:'Skill Block 1',         pct:0.35, phases:['skill'],                   drillCount:2, note:'Deliberate practice — coach cues, quality reps.' },
+        { title:'Skill Block 2',         pct:0.35, phases:['skill','game'],            drillCount:2, note:'Apply the skill under light pressure.' },
+        { title:'Cool Down',             pct:0.15, phases:['cooldown','skill'],        drillCount:1, note:'Finish with reflection: what improved?' },
+      ]
+    },
+    speed: {
+      label: 'Speed & Agility',
+      sections: [
+        { title:'Activation',            pct:0.20, phases:['warmup'],                  drillCount:2, note:'Dynamic movement prep — increase heart rate gradually.' },
+        { title:'Speed Block',           pct:0.35, phases:['conditioning','warmup'],   drillCount:2, note:'Maximum effort — full recovery between reps.' },
+        { title:'Agility & Reaction',    pct:0.30, phases:['conditioning','warmup'],   drillCount:2, note:'Change of direction under fatigue.' },
+        { title:'Cool Down & Mobility',  pct:0.15, phases:['cooldown','skill'],        drillCount:1, note:'Static stretching — hips, hamstrings, calves.' },
+      ]
+    },
+    strength: {
+      label: 'Strength',
+      sections: [
+        { title:'Activation',            pct:0.15, phases:['warmup'],                  drillCount:1, note:'Glute activation and joint prep before loading.' },
+        { title:'Strength Block 1',      pct:0.35, phases:['conditioning'],            drillCount:2, note:'Primary compound movements — heaviest loads of the session.' },
+        { title:'Strength Block 2',      pct:0.35, phases:['conditioning'],            drillCount:2, note:'Accessory work and injury prevention exercises.' },
+        { title:'Cool Down',             pct:0.15, phases:['cooldown','skill'],        drillCount:1, note:'Stretch the muscles worked — hold 30–45 seconds each.' },
+      ]
+    },
+    athleticism: {
+      label: 'Athleticism',
+      sections: [
+        { title:'Activation',            pct:0.15, phases:['warmup'],                  drillCount:2, note:'Plyometric prep — ankle hops, bounding, lateral movement.' },
+        { title:'Power & Explosiveness', pct:0.30, phases:['conditioning'],            drillCount:2, note:'Maximum effort jumps and throws. Full recovery.' },
+        { title:'Skill Integration',     pct:0.30, phases:['skill','game'],            drillCount:2, note:'Apply athleticism in basketball-specific movement.' },
+        { title:'Cool Down',             pct:0.25, phases:['cooldown','conditioning'], drillCount:1, note:'Mobility work — hips, thoracic spine, ankles.' },
+      ]
+    },
+  };
+
+  const config = SESSION_TYPES[sessionType] || SESSION_TYPES.full;
+
+  const warnings = drills.filter(d =>
+    planAge >= d.ageMin && planAge <= d.ageMax &&
+    d.levels.includes(planLevel) &&
+    d.players > 1 && d.players > planPlayerCount
+  ).map(d => '"'+d.name+'" needs '+d.players+'+ players');
+
+  const eligible = drills.filter(d =>
+    planAge >= d.ageMin && planAge <= d.ageMax &&
+    d.levels.includes(planLevel) &&
+    (d.players <= 1 || d.players <= planPlayerCount)
+  );
+
+  const scoreDrill = (d, sectionPhases) => {
+    let score = 0;
+    // Phase match — strong preference for correct phase
+    if (sectionPhases.includes(d.phase || 'skill')) score += 20;
+    // Skill/weakness match
+    if (allSkillIds.length > 0) score += drillFocusTags(d).filter(ft => allSkillIds.includes(ft)).length * 10;
+    // Favourites
+    if (state.favorites.includes(d.id)) score += 3;
+    // Small random factor for variety
+    score += Math.random() * 2;
+    return score;
+  };
+
+  const used = new Set();
+  const pickTop = (pool, n) => {
+    const result = [];
+    for (const d of pool) { if (!used.has(d.id) && result.length < n) { result.push(d); used.add(d.id); } }
+    return result;
+  };
+
+  // Build each section
+  const totalPct = config.sections.reduce((sum, s) => sum + s.pct, 0);
+  let timeRemaining = planDuration;
+  const builtSections = config.sections.map((sec, i) => {
+    const isLast = i === config.sections.length - 1;
+    const duration = isLast ? timeRemaining : Math.round(planDuration * (sec.pct / totalPct));
+    if (!isLast) timeRemaining -= duration;
+
+    // Score and sort eligible drills for this section's phases
+    const pool = [...eligible].sort((a,b) => scoreDrill(b, sec.phases) - scoreDrill(a, sec.phases));
+    const sectionDrills = pickTop(pool, sec.drillCount);
+
+    // Build section note
+    const matchedLabels = [...new Set(sectionDrills.flatMap(d => drillFocusTags(d)).filter(id => allSkillIds.includes(id)))].slice(0,2).map(id => skillLabel(id));
+    const note = sec.note || (matchedLabels.length > 0 ? 'Targeting: '+matchedLabels.join(', ')+'.' : '');
+
+    return { title: sec.title, duration, drills: sectionDrills, notes: note };
+  });
+
+  const weaknessSummary = rawWeaknesses.slice(0,4).map(w => w.source+': '+w.title);
+  const focusLabel = allSkillIds.length > 0
+    ? allSkillIds.slice(0,3).map(id => skillLabel(id)).join(', ')
+    : 'balanced development';
+
+  let coachNote = rawWeaknesses.length > 0
+    ? 'Plan prioritised around identified weaknesses: '+weaknessSummary.join(' · ')+'.'
+    : notesContext.length > 0
+      ? 'Session tailored for '+contextLabel+'. Notes: '+notesContext.slice(0,2).join('; ')+'.'
+      : config.label+' session — '+planDuration+' min, focused on '+focusLabel+'.';
+
+  return {
+    title: config.label+' — '+focusLabel.split(',')[0].trim(),
+    subtitle: 'Age '+planAge+' · '+planLevel+' · '+planDuration+' min · '+planPlayerCount+' players',
+    contextLabel, coachNotes: coachNote, weaknessSummary, skillIds: allSkillIds, warnings,
+    sections: builtSections,
+  };
+}
+
+
+function renderPlanWizard() {
+  if (state.generatedPlan) return renderPlanOutput();
+  const step = state.planStep || 1;
+  const steps = ['Who is this for?', 'Session Details', 'Review & Generate'];
+  const stepNav = `
+  <div style="display:flex;align-items:center;gap:0;margin-bottom:28px">
+    ${steps.map((s,i) => {
+      const n = i+1;
+      const active = step === n;
+      const done = step > n;
+      const col = done ? '#22c55e' : active ? '#e87722' : '#334155';
+      const textCol = done ? '#22c55e' : active ? '#fff' : '#475569';
+      return `
+      <div style="display:flex;align-items:center;flex:1">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+          <div style="width:28px;height:28px;border-radius:50%;background:${done?'#22c55e':active?'#e87722':'#1e293b'};border:2px solid ${col};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${done?'#000':active?'#fff':'#475569'}">${done?'✓':n}</div>
+          <span style="font-size:10px;color:${textCol};text-align:center;letter-spacing:.03em;font-weight:${active?700:400}">${s}</span>
+        </div>
+        ${i < steps.length-1 ? `<div style="height:2px;flex:1;background:${step>n?'#22c55e':'#1e293b'};margin:0 4px;margin-top:-12px"></div>` : ''}
+      </div>`;
+    }).join('')}
+  </div>`;
+  if (step === 1) return renderPlanStep1(stepNav);
+  if (step === 2) return renderPlanStep2(stepNav);
+  if (step === 3) return renderPlanStep3(stepNav);
+  return '';
+}
+
+function renderPlanBuilder() { return renderPlanWizard(); } // legacy alias
+
+function renderPlanStep1(stepNav) {
+  const { planMode, planTeamId, planPlayerIds, players, teams } = state;
+  const selectedTeam = teams.find(t => t.id === planTeamId);
+  const selectedPlayers = players.filter(p => planPlayerIds.includes(p.id));
+
+  // Collect weakness preview
+  const getWeaknessPreview = () => {
+    let items = [];
+    if (planMode === 'team' && selectedTeam) {
+      (selectedTeam.notes||[]).filter(n=>n.category==='Weakness'||n.category==='Focus Area').forEach(n=>items.push({source:selectedTeam.name,note:n}));
+      players.filter(p=>selectedTeam.playerIds?.includes(p.id)).forEach(p=>{
+        (p.notes||[]).filter(n=>n.category==='Weakness'||n.category==='Focus Area').forEach(n=>items.push({source:p.name,note:n}));
+      });
+    } else if (planMode === 'players') {
+      selectedPlayers.forEach(p=>{
+        (p.notes||[]).filter(n=>n.category==='Weakness'||n.category==='Focus Area').forEach(n=>items.push({source:p.name,note:n}));
+      });
+    }
+    return items;
+  };
+
+  const weaknesses = getWeaknessPreview();
+  const canProceed = planMode === 'general' || (planMode === 'team' && planTeamId) || (planMode === 'players' && planPlayerIds.length > 0);
+
+  return `
+  <div>
+    <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">New Practice Plan</h2>
+    <p style="color:#475569;font-size:13px;margin-bottom:20px">Start by choosing who this session is for — the plan will prioritise their weaknesses.</p>
+    ${stepNav}
+
+    <div class="label" style="margin-bottom:8px">Who is this session for?</div>
+    <div style="display:grid;gap:8px;margin-bottom:16px">
+      ${[['team','🏆','A Team','Select a team — uses team notes and all player profiles'],['players','👤','Individual Player(s)','Select one or more players from your roster'],['general','🏀','General Group','No specific player data — balanced session']].map(([m,icon,label,desc])=>`
+      <div onclick="setState({planMode:'${m}',planPlayerIds:[],planTeamId:''})" style="background:${planMode===m?'rgba(232,119,34,0.1)':'rgba(255,255,255,0.03)'};border:2px solid ${planMode===m?'#e87722':'rgba(255,255,255,0.08)'};border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s">
+        <span style="font-size:20px">${icon}</span>
+        <div style="flex:1">
+          <p style="color:${planMode===m?'#fff':'#cbd5e1'};font-size:14px;font-weight:700;margin:0 0 2px">${label}</p>
+          <p style="color:#475569;font-size:12px;margin:0">${desc}</p>
+        </div>
+        ${planMode===m?'<span style="color:#e87722;font-size:16px">✓</span>':''}
+      </div>`).join('')}
+    </div>
+
+    ${planMode==='team'?`
+    <div style="margin-bottom:16px">
+      <div class="label">Select Team</div>
+      ${teams.length===0?`<div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;text-align:center"><p style="color:#475569;font-size:13px;margin:0">No teams yet. <span style="color:#e87722;cursor:pointer" onclick="setState({tab:'teams'})">Add a team →</span></p></div>`:`
+      <div style="display:grid;gap:7px">
+        ${teams.map(t=>{
+          const tp=players.filter(p=>t.playerIds?.includes(p.id));
+          const tw=(t.notes||[]).filter(n=>(n._skill&&n.rating==='weakness')||n.category==='Weakness'||n.category==='Focus Area');
+          const pw=tp.reduce((a,p)=>a+(p.notes||[]).filter(n=>n.category==='Weakness'||n.category==='Focus Area').length,0);
+          const sel=planTeamId===t.id;
+          return `<div onclick="setState({planTeamId:'${t.id}',planLevel:'${t.level||'intermediate'}',planPlayerCount:Math.max(${tp.length},2)})" style="background:${sel?'rgba(232,119,34,0.1)':'rgba(255,255,255,0.03)'};border:2px solid ${sel?'#e87722':'rgba(255,255,255,0.08)'};border-radius:9px;padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <p style="color:#fff;font-size:14px;font-weight:700;margin:0 0 4px">${t.name}</p>
+              <div style="display:flex;gap:5px">${t.ageGroup?badge(t.ageGroup,'#64748b'):''}${t.level?levelBadge(t.level):''}${badge(tp.length+' players','#475569')}</div>
+            </div>
+            <div style="text-align:right">
+              ${(tw.length+pw)>0?`<span style="color:#ef4444;font-size:11px;font-weight:700">${tw.length+pw} weakness note${tw.length+pw>1?'s':''}</span>`:'<span style="color:#334155;font-size:11px">no weakness notes</span>'}
+              ${sel?'<p style="color:#e87722;font-size:11px;margin:2px 0 0">Selected ✓</p>':''}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`}
+    </div>`:''}
+
+    ${planMode==='players'?`
+    <div style="margin-bottom:16px">
+      <div class="label">${planPlayerIds.length} player${planPlayerIds.length!==1?'s':''} selected</div>
+      ${players.length===0?`<div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;text-align:center"><p style="color:#475569;font-size:13px;margin:0">No players yet. <span style="color:#e87722;cursor:pointer" onclick="setState({tab:'players'})">Add players →</span></p></div>`:`
+      <div style="display:grid;gap:6px;max-height:280px;overflow-y:auto">
+        ${players.map(p=>{
+          const sel=planPlayerIds.includes(p.id);
+          const pw=(p.notes||[]).filter(n=>(n._skill&&n.rating==='weakness')||n.category==='Weakness'||n.category==='Focus Area');
+          return `<div onclick="togglePlanPlayer('${p.id}')" style="background:${sel?'rgba(232,119,34,0.08)':'rgba(255,255,255,0.02)'};border:2px solid ${sel?'#e87722':'rgba(255,255,255,0.06)'};border-radius:8px;padding:10px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;gap:10px;align-items:center">
+              <span style="font-size:16px">${sel?'✅':'⬜'}</span>
+              <div>
+                <p style="color:#e2e8f0;font-size:13px;font-weight:600;margin:0 0 3px">${p.name}</p>
+                <div style="display:flex;gap:4px">${p.level?levelBadge(p.level):''}</div>
+              </div>
+            </div>
+            ${pw.length>0?`<span style="color:#ef4444;font-size:11px;font-weight:700">${pw.length} weakness note${pw.length>1?'s':''}</span>`:'<span style="color:#334155;font-size:11px">no notes</span>'}
+          </div>`;
+        }).join('')}
+      </div>`}
+    </div>`:''}
+
+    ${weaknesses.length > 0 ? `
+    <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+      <p style="color:#ef4444;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">⚠ Weaknesses detected — plan will prioritise these</p>
+      ${weaknesses.slice(0,5).map(w=>`
+      <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px">
+        <span style="color:#ef4444;font-size:11px;flex-shrink:0;margin-top:1px">→</span>
+        <div><span style="color:#94a3b8;font-size:12px;font-weight:600">${w.source}:</span> <span style="color:#cbd5e1;font-size:12px">${w.note.title}${w.note.content?' — '+w.note.content:''}</span></div>
+      </div>`).join('')}
+      ${weaknesses.length>5?`<p style="color:#475569;font-size:11px;margin:4px 0 0">+${weaknesses.length-5} more…</p>`:''}
+    </div>`:''}
+
+    ${planMode==='general'?`<div style="background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:12px 14px;margin-bottom:16px"><p style="color:#475569;font-size:12px;margin:0">No player data loaded. The plan will be balanced across all focus areas. Add players and notes to get personalised plans.</p></div>`:''}
+
+    <button onclick="${canProceed?`setState({planStep:2})`:'null'}" ${canProceed?'':'disabled'} style="background:${canProceed?'#e87722':'#334155'};color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:${canProceed?'pointer':'not-allowed'};width:100%">
+      Next: Session Details →
+    </button>
+  </div>`;
+}
+
+function renderPlanStep2(stepNav) {
+  const { planAge, planLevel, planDuration, planPlayerCount, planFocus, planSessionType } = state;
+  const sessionTypes = [
+    { id:'full',        label:'Full Session',     icon:'🏀', desc:'Warm-up, skill work, game play, cool down' },
+    { id:'game',        label:'Game-Based',        icon:'🆚', desc:'Two competitive games with warm-up' },
+    { id:'skills',      label:'Skills Focus',      icon:'⚙️', desc:'Two skill blocks with light game application' },
+    { id:'speed',       label:'Speed & Agility',   icon:'⚡', desc:'Activation, speed, agility, mobility' },
+    { id:'strength',    label:'Strength',          icon:'💪', desc:'Activation, compound lifts, accessory work' },
+    { id:'athleticism', label:'Athleticism',       icon:'🦾', desc:'Power, explosiveness, basketball integration' },
+  ];
+  return `
+  <div>
+    <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Session Details</h2>
+    <p style="color:#475569;font-size:13px;margin-bottom:20px">Set the parameters for this session.</p>
+    ${stepNav}
+
+    <div style="margin-bottom:16px">
+      <div class="label">Session Type</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px">
+        ${sessionTypes.map(st => `
+        <div onclick="setState({planSessionType:'${st.id}'})" style="background:${(planSessionType||'full')===st.id?'rgba(232,119,34,0.12)':'rgba(255,255,255,0.02)'};border:2px solid ${(planSessionType||'full')===st.id?'#e87722':'rgba(255,255,255,0.07)'};border-radius:9px;padding:10px 13px;cursor:pointer;transition:all .15s">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            <span style="font-size:16px">${st.icon}</span>
+            <span style="color:${(planSessionType||'full')===st.id?'#fff':'#cbd5e1'};font-size:13px;font-weight:700;font-family:'Barlow Condensed',sans-serif">${st.label}</span>
+            ${(planSessionType||'full')===st.id?'<span style="color:#e87722;font-size:11px;margin-left:auto">✓</span>':''}
+          </div>
+          <p style="color:#475569;font-size:11px;margin:0;line-height:1.4">${st.desc}</p>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div><div class="label">Player Age</div><input type="number" value="${planAge}" min="6" max="22" onchange="setState({planAge:+this.value})"/></div>
+      <div><div class="label">Skill Level</div>
+        <select onchange="setState({planLevel:this.value})">
+          ${['beginner','intermediate','advanced'].map(l=>`<option value="${l}" ${planLevel===l?'selected':''}>${l.charAt(0).toUpperCase()+l.slice(1)}</option>`).join('')}
+        </select>
+      </div>
+      <div><div class="label">Session Length (min)</div><input type="number" value="${planDuration}" min="20" max="120" step="5" onchange="setState({planDuration:+this.value})"/></div>
+      <div><div class="label">Players Available</div><input type="number" value="${planPlayerCount}" min="2" max="25" onchange="setState({planPlayerCount:+this.value})"/></div>
+    </div>
+    <div style="margin-top:14px">
+      <div class="label">Additional Skills to target <span style="color:#334155;font-weight:400;text-transform:none;font-size:11px">(optional — player weakness skills already included)</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+        ${SKILLS().map(s=>`<button data-plan-skill="${s.id}" onclick="togglePlanFocus('${s.id}')" style="background:${planFocus.includes(s.id)?'#e87722':'#1e293b'};border:1px solid ${planFocus.includes(s.id)?'#e87722':'#334155'};border-radius:6px;padding:5px 12px;font-size:12px;color:${planFocus.includes(s.id)?'#fff':'#64748b'};cursor:pointer;font-family:inherit;font-weight:${planFocus.includes(s.id)?700:400};transition:all .15s">${s.label}</button>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button onclick="setState({planStep:1})" style="background:#1e293b;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">← Back</button>
+      <button onclick="setState({planStep:3})" style="background:#e87722;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex:1">Next: Review →</button>
+    </div>
+  </div>`;
+}
+
+function renderPlanStep3(stepNav) {
+  const { planMode, planTeamId, planPlayerIds, planAge, planLevel, planDuration, planPlayerCount, planFocus, planSessionType, players, teams } = state;
+  const { skillIds, rawWeaknesses, contextLabel } = extractWeaknesses();
+  const allFocus = [...new Set([...planFocus,...skillIds])];
+  const selectedTeam = teams.find(t=>t.id===planTeamId);
+  const selectedPlayers = players.filter(p=>planPlayerIds.includes(p.id));
+
+  return `
+  <div>
+    <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Review & Generate</h2>
+    <p style="color:#475569;font-size:13px;margin-bottom:20px">Confirm the plan before generating.</p>
+    ${stepNav}
+
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:18px;margin-bottom:16px">
+      <div style="display:grid;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #1e293b">
+          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">For</span>
+          <span style="color:#fff;font-size:13px;font-weight:600">${contextLabel}</span>
+        </div>
+        ${planMode==='team'&&selectedTeam?`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #1e293b">
+          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Roster</span>
+          <span style="color:#94a3b8;font-size:12px">${players.filter(p=>selectedTeam.playerIds?.includes(p.id)).map(p=>p.name).join(', ')||'—'}</span>
+        </div>`:''}
+        ${planMode==='players'&&selectedPlayers.length>0?`
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:10px;border-bottom:1px solid #1e293b">
+          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Players</span>
+          <span style="color:#94a3b8;font-size:12px;text-align:right">${selectedPlayers.map(p=>p.name).join(', ')}</span>
+        </div>`:''}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #1e293b">
+          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Session Type</span>
+          <span style="color:#e87722;font-size:12px;font-weight:700">${(['full','game','skills','speed','strength','athleticism'].includes(planSessionType)?{'full':'🏀 Full Session','game':'🆚 Game-Based','skills':'⚙️ Skills Focus','speed':'⚡ Speed & Agility','strength':'💪 Strength','athleticism':'🦾 Athleticism'}[planSessionType]:'🏀 Full Session')}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #1e293b">
+          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Session</span>
+          <span style="color:#94a3b8;font-size:12px">Age ${planAge} · ${planLevel} · ${planDuration} min · ${planPlayerCount} players</span>
+        </div>
+        ${rawWeaknesses.length>0?`
+        <div style="padding-bottom:10px;border-bottom:1px solid #1e293b">
+          <span style="color:#ef4444;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Weaknesses to address</span>
+          ${rawWeaknesses.slice(0,4).map(w=>`<p style="color:#cbd5e1;font-size:12px;margin:3px 0"><span style="color:#94a3b8">${w.source}:</span> ${w.title}</p>`).join('')}
+        </div>`:''}
+        <div>
+          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Drill focus will target</span>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            ${allFocus.length>0?allFocus.map(id=>badge(skillLabel(id),'#e87722')).join(''):badge('balanced','#64748b')}
+            ${rawWeaknesses.length>0?'<span style="color:#ef4444;font-size:11px;align-self:center;margin-left:4px">← from player weaknesses</span>':''}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="setState({planStep:2})" style="background:#1e293b;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">← Back</button>
+      <button onclick="buildPlan()" style="background:#e87722;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:15px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex:1">Generate Plan →</button>
+    </div>
+  </div>`;
+}
+
+function renderPlanOutput() {
+  const plan = state.generatedPlan;
+  if (!plan) return '';
+  return `
+  <div style="background:#080f1a;border:1px solid #e87722;border-radius:14px;padding:24px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:8px">
+      <div>
+        <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">${plan.title}</h2>
+        <p style="color:#64748b;font-size:13px;margin:0">${plan.subtitle}</p>
+        ${plan.contextLabel&&plan.contextLabel!=='General Group'?`<p style="color:#e87722;font-size:12px;margin:4px 0 0">For: ${plan.contextLabel}</p>`:''}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn" style="background:#1e293b;padding:6px 12px;font-size:11px" onclick="copyPlan()">Copy Plan</button>
+        ${!state.planSaved?`<button class="btn" style="background:#22c55e;padding:6px 12px;font-size:11px" onclick="saveSession()">💾 Save to History</button>`:`<span style="color:#22c55e;font-size:11px;padding:6px 4px">✓ Saved</span>`}
+        <button class="btn" style="background:#334155;padding:6px 12px;font-size:11px" onclick="setState({generatedPlan:null,planSaved:false,planStep:1})">New Plan</button>
+      </div>
+    </div>
+    ${plan.weaknessSummary&&plan.weaknessSummary.length?`
+    <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+      <p style="color:#ef4444;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Weaknesses being addressed this session</p>
+      ${plan.weaknessSummary.map(w=>`<p style="color:#fca5a5;font-size:12px;margin:3px 0">→ ${w}</p>`).join('')}
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(239,68,68,0.15);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="color:#818cf8;font-size:11px;font-weight:700;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:4px;padding:2px 8px">matched</span>
+        <span style="color:#64748b;font-size:11px">= drill was specifically chosen to address a weakness</span>
+        <span style="color:#a5b4fc;font-size:11px">· purple focus tags = matched areas</span>
+      </div>
+    </div>`:''}
+    ${plan.warnings&&plan.warnings.length?`<div class="warn-box" style="margin-bottom:16px"><p style="color:#ef4444;font-size:12px;font-weight:700;margin-bottom:4px">Drills excluded (player count):</p>${plan.warnings.map(w=>`<p style="color:#fca5a5;font-size:11px;margin:2px 0">• ${w}</p>`).join('')}</div>`:''}
+    ${plan.sections.map(s=>`
+    <div class="plan-section">
+      <div class="plan-section-head">
+        <span class="section-bar"></span>
+        <span class="condensed" style="font-size:15px;font-weight:700;color:#e87722;letter-spacing:.04em;text-transform:uppercase">${s.title}</span>
+        <span style="color:#475569;font-size:12px">${s.duration} min</span>
+      </div>
+      ${s.drills.length?s.drills.map(d=>renderDrillCard(d,{compact:true,playerCount:state.planPlayerCount,matchedTags:state.generatedPlan&&state.generatedPlan.skillIds?state.generatedPlan.skillIds:[]})).join(''):`<p style="color:#334155;font-size:12px;font-style:italic;padding-left:12px">No matching drills — consider adding more to your library.</p>`}
+      ${s.notes?`<p style="color:#64748b;font-size:12px;font-style:italic;margin:4px 0 0 12px">${s.notes}</p>`:''}
+    </div>`).join('')}
+    ${plan.coachNotes?`<div class="divider"></div><p style="color:#64748b;font-size:12px"><strong style="color:#94a3b8">Coach Notes: </strong>${plan.coachNotes}</p>`:''}
+  </div>`;
+}
+
+// ── TAB: Players ──────────────────────────────────────────────────────────────
+function renderPlayers() {
+  const { playerView, selectedPlayer, playerForm, players, sessions } = state;
+
+  if (playerView==='form') {
+    const f = playerForm||{};
+    return `
+    <div>
+      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({playerView:${selectedPlayer?`'detail'`:`'list'`},playerForm:null})">← Back</button>
+      <div class="form-box">
+        <h3 class="condensed" style="font-size:18px;color:#e87722;margin-bottom:16px">${f._edit?'Edit Player':'New Player'}</h3>
+        <div class="grid2">
+          <div class="span2"><div class="label">Full Name</div><input id="pf-name" value="${f.name||''}" placeholder="Player name"/></div>
+          <div><div class="label">Age</div><input id="pf-age" type="number" value="${f.age||''}" min="6" max="25"/></div>
+          <div><div class="label">Skill Level</div>
+            <select id="pf-level">
+              ${LEVEL_OPTIONS().map(l=>`<option value="${l}" ${(f.level||'intermediate')===l?'selected':''}>${l.charAt(0).toUpperCase()+l.slice(1)}</option>`).join('')}
+            </select>
+          </div>
+
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="btn" style="background:#e87722;padding:8px 20px;font-size:13px" onclick="savePlayer()">Save Player</button>
+          <button class="btn" style="background:#334155;padding:8px 16px;font-size:13px" onclick="setState({playerView:${selectedPlayer?`'detail'`:`'list'`},playerForm:null})">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (playerView==='detail' && selectedPlayer) {
+    const p = players.find(x=>x.id===selectedPlayer.id)||selectedPlayer;
+    const ps = sessions.filter(s=>s.playerIds&&s.playerIds.includes(p.id));
+    return `
+    <div>
+      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({playerView:'list',selectedPlayer:null})">← All Players</button>
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px;margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;border-radius:50%;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:18px">🏀</div>
+            <div>
+              <h2 class="condensed" style="font-size:24px;color:#fff;margin-bottom:6px">${p.name}</h2>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                ${p.age?badge('Age '+p.age,'#64748b'):''}
+                ${p.level?levelBadge(p.level):''}
+
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px">
+            ${btn('Edit','#334155',`editPlayer('${p.id}')`)}
+            ${btn('Delete','#7f1d1d',`deletePlayer('${p.id}')`)}
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#e87722"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#e87722;letter-spacing:.04em;text-transform:uppercase">Coaching Notes</span></div>
+        ${renderNotesList(p.notes||[], p.id, 'player')}
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#3b82f6"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#3b82f6;letter-spacing:.04em;text-transform:uppercase">Session History</span>${badge(ps.length+' sessions','#3b82f6')}</div>
+        ${renderSessionHistory(ps)}
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div><h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Players</h2><p style="color:#475569;font-size:13px">Manage player profiles, coaching notes, and session history.</p></div>
+      <button class="btn" style="background:#e87722;padding:8px 16px;font-size:13px;font-weight:700" onclick="newPlayer()">+ Add Player</button>
+    </div>
+    ${players.length===0?`<div class="empty-state"><div class="icon">👤</div><p>No players yet. Add your first player.</p></div>`:''}
+    ${players.map(p=>`
+    <div class="card" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="openPlayer('${p.id}')">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:50%;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:15px">🏀</div>
+        <div>
+          <p class="condensed" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px">${p.name}</p>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">${p.age?badge('Age '+p.age,'#64748b'):''}${p.level?levelBadge(p.level):''}</div>
+        </div>
+      </div>
+      <div style="text-align:right"><p style="color:#475569;font-size:11px;margin:0">${(p.notes||[]).length} notes</p><p style="color:#334155;font-size:11px;margin:2px 0 0">${sessions.filter(s=>s.playerIds?.includes(p.id)).length} sessions</p></div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ── TAB: Teams ────────────────────────────────────────────────────────────────
+function renderTeams() {
+  const { teamView, selectedTeam, teamForm, pickingPlayers, teams, players, sessions } = state;
+
+  if (teamView==='form') {
+    const f = teamForm||{};
+    return `
+    <div>
+      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({teamView:${selectedTeam?`'detail'`:`'list'`},teamForm:null,pickingPlayers:false})">← Back</button>
+      <div class="form-box">
+        <h3 class="condensed" style="font-size:18px;color:#e87722;margin-bottom:16px">${f._edit?'Edit Team':'New Team'}</h3>
+        <div class="grid2">
+          <div class="span2"><div class="label">Team Name</div><input id="tf-name" value="${f.name||''}" placeholder="e.g. U14 Warriors"/></div>
+          <div><div class="label">Age Group</div><input id="tf-age" value="${f.ageGroup||''}" placeholder="e.g. U14"/></div>
+          <div><div class="label">Skill Level</div>
+            <select id="tf-level">
+              ${LEVEL_OPTIONS().map(l=>`<option value="${l}" ${(f.level||'intermediate')===l?'selected':''}>${l.charAt(0).toUpperCase()+l.slice(1)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div class="label" style="margin:0">Players (${(f.playerIds||[]).length} selected)</div>
+            <button class="btn" style="background:${pickingPlayers?'#e87722':'#1e293b'}" onclick="setState({pickingPlayers:!state.pickingPlayers})">${pickingPlayers?'Done':'Select Players'}</button>
+          </div>
+          ${pickingPlayers?`
+          <div style="display:grid;gap:5px;max-height:180px;overflow-y:auto">
+            ${players.length===0?`<p style="color:#475569;font-size:12px">No players yet.</p>`:''}
+            ${players.map(p=>{const sel=(f.playerIds||[]).includes(p.id);return`
+            <div onclick="toggleTeamPlayer('${p.id}')" style="background:${sel?'rgba(232,119,34,0.1)':'rgba(255,255,255,0.02)'};border:1px solid ${sel?'#e8772255':'rgba(255,255,255,0.06)'};border-radius:7px;padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+              <div style="display:flex;gap:8px;align-items:center"><span>${sel?'✅':'⬜'}</span><span style="color:#e2e8f0;font-size:13px">${p.name}</span></div>
+              <div style="display:flex;gap:4px">${p.level?levelBadge(p.level):''}</div>
+            </div>`;}).join('')}
+          </div>`:`
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${(f.playerIds||[]).length===0?`<p style="color:#334155;font-size:12px;font-style:italic">No players selected yet.</p>`:''}
+            ${(f.playerIds||[]).map(pid=>{const pl=players.find(x=>x.id===pid);return pl?badge(pl.name,'#e87722'):''}).join('')}
+          </div>`}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="btn" style="background:#e87722;padding:8px 20px;font-size:13px" onclick="saveTeam()">Save Team</button>
+          <button class="btn" style="background:#334155;padding:8px 16px;font-size:13px" onclick="setState({teamView:${selectedTeam?`'detail'`:`'list'`},teamForm:null,pickingPlayers:false})">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (teamView==='detail' && selectedTeam) {
+    const t = teams.find(x=>x.id===selectedTeam.id)||selectedTeam;
+    const tp = players.filter(p=>t.playerIds?.includes(p.id));
+    const ts = sessions.filter(s=>s.teamId===t.id);
+    return `
+    <div>
+      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({teamView:'list',selectedTeam:null})">← All Teams</button>
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px;margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+          <div>
+            <h2 class="condensed" style="font-size:24px;color:#fff;margin-bottom:8px">${t.name}</h2>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">${t.ageGroup?badge(t.ageGroup,'#64748b'):''}${t.level?levelBadge(t.level):''}${badge(tp.length+' players','#475569')}</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            ${btn('Edit','#334155',`editTeam('${t.id}')`)}
+            ${btn('Delete','#7f1d1d',`deleteTeam('${t.id}')`)}
+          </div>
+        </div>
+      </div>
+      ${tp.length>0?`
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="section-bar" style="background:#f97316"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:.04em">Roster</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${tp.map(p=>`<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:6px 10px;display:flex;gap:7px;align-items:center"><span style="color:#e2e8f0;font-size:13px;font-weight:600">${p.name}</span></div>`).join('')}</div>
+      </div>`:''}
+      <div class="divider"></div>
+      <div style="margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#e87722"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#e87722;text-transform:uppercase;letter-spacing:.04em">Team Notes</span></div>
+        ${renderNotesList(t.notes||[], t.id, 'team')}
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#3b82f6"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.04em">Session History</span>${badge(ts.length+' sessions','#3b82f6')}</div>
+        ${renderSessionHistory(ts)}
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div><h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Teams</h2><p style="color:#475569;font-size:13px">Manage teams, rosters, team notes, and session history.</p></div>
+      <button class="btn" style="background:#e87722;padding:8px 16px;font-size:13px;font-weight:700" onclick="newTeam()">+ Add Team</button>
+    </div>
+    ${teams.length===0?`<div class="empty-state"><div class="icon">🏆</div><p>No teams yet. Add your first team.</p></div>`:''}
+    ${teams.map(t=>{const tp=players.filter(p=>t.playerIds?.includes(p.id));const ts=sessions.filter(s=>s.teamId===t.id);return`
+    <div class="card" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="openTeam('${t.id}')">
+      <div>
+        <p class="condensed" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:5px">${t.name}</p>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">${t.ageGroup?badge(t.ageGroup,'#64748b'):''}${t.level?levelBadge(t.level):''}${badge(tp.length+' players','#475569')}</div>
+      </div>
+      <div style="text-align:right"><p style="color:#475569;font-size:11px;margin:0">${(t.notes||[]).length} notes</p><p style="color:#334155;font-size:11px;margin:2px 0 0">${ts.length} sessions</p></div>
+    </div>`;}).join('')}
+  </div>`;
+}
+
+// ── TAB: Library ──────────────────────────────────────────────────────────────
+function renderLibrary() {
+  const { drills, favorites, libSearch, libLevel, libFocus, showDrillForm, editDrill } = state;
+  const filtered = drills.filter(d=>
+    (!libSearch||d.name.toLowerCase().includes(libSearch.toLowerCase())||d.source.toLowerCase().includes(libSearch.toLowerCase()))&&
+    (!libLevel||d.levels.includes(libLevel))&&(!libFocus||drillFocusTags(d).includes(libFocus))
+  );
+  const sorted = [...filtered].sort((a,b)=>(favorites.includes(b.id)?1:0)-(favorites.includes(a.id)?1:0));
+
+  return `
+  <div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div><h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Drill Library</h2><p style="color:#475569;font-size:13px">Your curated drill database. ⭐ pins favourites to the top.</p></div>
+      <button class="btn" style="background:#e87722;padding:8px 16px;font-size:13px;font-weight:700" onclick="newDrill()">+ Add Drill</button>
+    </div>
+    ${showDrillForm||editDrill?renderDrillForm():''}
+    <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap">
+      <input style="flex:1;min-width:140px" placeholder="Search…" value="${libSearch}" oninput="setState({libSearch:this.value})"/>
+      <select style="width:130px" onchange="setState({libLevel:this.value})"><option value="">All levels</option>${LEVEL_OPTIONS().map(l=>`<option value="${l}" ${libLevel===l?'selected':''}>${l}</option>`).join('')}</select>
+      <select style="width:160px" onchange="setState({libFocus:this.value})">
+        <option value="">All skills</option>
+        ${SKILLS().map(s=>`<option value="${s.id}" ${libFocus===s.id?'selected':''}>${s.label}</option>`).join('')}
+      </select>
+    </div>
+    <p style="color:#475569;font-size:12px;margin-bottom:8px">${sorted.length} drills · ${favorites.length} starred</p>
+    ${sorted.map(d=>renderDrillCard(d,{showFav:true,showEdit:true})).join('')}
+  </div>`;
+}
+
+function renderDrillCard(drill, opts={}) {
+  const { showFav=false, showEdit=false, playerCount=0, compact=false, matchedTags=[] } = opts;
+  const isFav = state.favorites.includes(drill.id);
+  const warn = playerCount > 0 && drill.players > 1 && playerCount < drill.players;
+  const matched = matchedTags.filter(id => (drill.focus||[]).includes(id));
+  const hasMatch = matched.length > 0;
+  const borderColor = hasMatch ? 'rgba(99,102,241,0.45)' : isFav ? 'rgba(232,119,34,0.3)' : warn ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.08)';
+  const bg = hasMatch ? 'rgba(99,102,241,0.06)' : isFav ? 'rgba(232,119,34,0.06)' : 'rgba(255,255,255,0.03)';
+  const id = 'dc_' + drill.id;
+  return `
+  <div style="background:${bg};border:1px solid ${borderColor};border-radius:10px;padding:${compact?'11px 13px':'15px 17px'};margin-bottom:9px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+      <div style="flex:1;cursor:pointer" onclick="toggleDrillExpand('${drill.id}')">
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+          <span>${drill.format==='game'?'🏀':'⚙️'}</span>
+          ${isFav?'<span>⭐</span>':''}
+          <span class="condensed" style="font-size:15px;font-weight:700;color:#fff">${drill.name}</span>
+          ${warn?`<span style="font-size:11px;color:#ef4444;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:4px;padding:1px 6px">needs ${drill.players}+</span>`:''}
+          ${hasMatch?`<span style="font-size:11px;color:#818cf8;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:4px;padding:1px 7px;font-weight:700">matched</span>`:''}
+          ${drill.phase?`<span style="font-size:10px;color:#475569;background:#1e293b;border-radius:4px;padding:1px 6px">${drill.phase}</span>`:''}
+        </div>
+        <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
+          ${(drill.levels||[]).map(l=>badge(l,LEVEL_COLORS[l])).join('')}
+          ${(drill.focus||[]).slice(0,3).map(id => {
+            const isMatch = matchedTags.includes(id);
+            return `<span class="badge" style="background:${isMatch?'rgba(99,102,241,0.2)':'rgba(232,119,34,0.13)'};color:${isMatch?'#818cf8':'#e87722'};border:1px solid ${isMatch?'rgba(99,102,241,0.4)':'rgba(232,119,34,0.3)'};${isMatch?'font-weight:800;':''}">${isMatch?'→ ':''} ${skillLabel(id)}</span>`;
+          }).join('')}
+          ${badge((drill.duration||0)+'min','#94a3b8')}
+          ${badge((drill.players<=1?'1':drill.players+'+')+' players', warn?'#ef4444':'#475569')}
+        </div>
+        ${hasMatch?`<div style="margin-top:7px;display:flex;align-items:center;gap:6px">
+          <span style="color:#818cf8;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Why chosen:</span>
+          <span style="color:#a5b4fc;font-size:11px">Addresses ${matched.map(id => '"'+skillLabel(id)+'"').join(', ')}</span>
+        </div>`:''}
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+        ${showFav?`<button onclick="toggleFav('${drill.id}')" style="background:none;border:none;cursor:pointer;font-size:15px;opacity:${isFav?1:.3}">⭐</button>`:''}
+        ${showEdit?`${btn('Edit','#334155',`editDrill('${drill.id}')`)} ${btn('✕','#7f1d1d',`deleteDrill('${drill.id}')`)} `:''}
+      </div>
+    </div>
+    <div id="${id}" style="display:none;margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px">
+      <p style="color:#cbd5e1;font-size:13px;line-height:1.6;margin-bottom:8px">${drill.description}</p>
+      <p style="color:#94a3b8;font-size:12px"><strong style="color:#e87722">Cues: </strong>${(drill.coachingCues||[]).filter(Boolean).join(' · ')}</p>
+      <p style="color:#475569;font-size:11px;margin-top:6px">Source: ${drill.source}</p>
+    </div>
+  </div>`;
+}
+
+function renderDrillForm() {
+  // Merge base drill with any in-progress edits from _drillFormState
+  const base = state.editDrill||{id:uid('d'),name:'',source:'',ageMin:8,ageMax:16,levels:[],duration:8,focus:[],description:'',coachingCues:['','',''],format:'game',players:6};
+  const f = Object.keys(_drillFormState).length > 0 ? {...base, ..._drillFormState} : base;
+  return `
+  <div class="form-box">
+    <h3 class="condensed" style="font-size:18px;color:#e87722;margin-bottom:14px">${state.editDrill?'Edit Drill':'Add Drill'}</h3>
+    <div class="grid2">
+      <div class="span2"><div class="label">Name</div><input id="df-name" value="${f.name}"/></div>
+      <div class="span2"><div class="label">Source / Credit</div><input id="df-source" value="${f.source}"/></div>
+      <div><div class="label">Min Age</div><input id="df-amin" type="number" value="${f.ageMin}"/></div>
+      <div><div class="label">Max Age</div><input id="df-amax" type="number" value="${f.ageMax}"/></div>
+      <div><div class="label">Duration (min)</div><input id="df-dur" type="number" value="${f.duration}"/></div>
+      <div><div class="label">Min Players</div><input id="df-players" type="number" value="${f.players}" min="1"/></div>
+      <div class="span2"><div class="label">Format</div>
+        <div class="toggle-row">${['game','skill'].map(ft=>`<button class="toggle-btn" id="df-fmt-${ft}" style="background:${f.format===ft?'#e87722':'#1e293b'}" onclick="setDrillFormat('${ft}')">${ft==='game'?'🏀':'⚙️'} ${ft}</button>`).join('')}</div>
+      </div>
+      <div class="span2"><div class="label">Levels</div>
+        <div class="toggle-row">${LEVEL_OPTIONS().map(l=>`<button class="toggle-btn" id="df-lvl-${l}" style="background:${f.levels.includes(l)?LEVEL_COLORS[l]:'#1e293b'}" onclick="toggleDrillLevel('${l}')">${l}</button>`).join('')}</div>
+      </div>
+      <div class="span2">
+        <div class="label">Training Plan Phase <span style="color:#475569;font-size:10px;font-weight:400;text-transform:none">(which section of a session this drill belongs in)</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+          ${[
+            {id:'warmup',      label:'Warm-Up / Activation', color:'#22c55e'},
+            {id:'skill',       label:'Skill Development',    color:'#3b82f6'},
+            {id:'game',        label:'Game / Competition',   color:'#e87722'},
+            {id:'conditioning',label:'Conditioning',         color:'#8b5cf6'},
+            {id:'cooldown',    label:'Cool Down',            color:'#64748b'},
+          ].map(p => {
+            const on = (f.phase||'skill') === p.id;
+            return `<button onclick="setDrillPhase('${p.id}')"
+              style="background:${on?p.color+'22':'#1e293b'};border:1px solid ${on?p.color+'88':'#334155'};border-radius:6px;padding:5px 12px;font-size:12px;color:${on?p.color:'#64748b'};cursor:pointer;font-family:inherit;font-weight:${on?700:400};transition:all .15s"
+            >${p.label}</button>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="span2">
+        <div class="label">Skills this drill develops</div>
+        <div id="drill-skills-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+          ${renderDrillSkillsList(f.focus||[])}
+        </div>
+      </div>
+      <div class="span2"><div class="label">Description</div><textarea id="df-desc" style="height:68px">${f.description}</textarea></div>
+      <div><div class="label">Cue 1</div><input id="df-c0" value="${f.coachingCues[0]||''}"/></div>
+      <div><div class="label">Cue 2</div><input id="df-c1" value="${f.coachingCues[1]||''}"/></div>
+      <div class="span2"><div class="label">Cue 3</div><input id="df-c2" value="${f.coachingCues[2]||''}"/></div>
+    </div>
+    <div style="display:flex;gap:7px;margin-top:14px">
+      <button class="btn" style="background:#e87722;padding:8px 18px;font-size:13px" onclick="saveDrill()">Save</button>
+      <button class="btn" style="background:#334155;padding:8px 14px;font-size:13px" onclick="setState({showDrillForm:false,editDrill:null});_drillFormState={};">Cancel</button>
+    </div>
+  </div>`;
+}
+
+// ── TAB: Concepts ─────────────────────────────────────────────────────────────
+function renderConcepts() {
+  const { conceptSelected, conceptFilter } = state;
+  const cats = [...new Set(CONCEPTS.map(c=>c.category))];
+
+  if (conceptSelected) {
+    const c = conceptSelected;
+    const color = CAT_COLORS[c.category]||'#e87722';
+    return `
+    <div>
+      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({conceptSelected:null})">← Back to Concepts</button>
+      <div style="background:rgba(255,255,255,.02);border:1px solid ${color}44;border-radius:14px;padding:24px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <span style="font-size:26px">${c.icon}</span>
+          <div>${badge(c.category,color)}<h2 class="condensed" style="font-size:24px;color:#fff;margin:6px 0 0">${c.title}</h2></div>
+        </div>
+        <p style="color:#94a3b8;font-size:13px;line-height:1.7;margin:0 0 18px;border-bottom:1px solid #1e293b;padding-bottom:18px">${c.summary}</p>
+        <h3 class="condensed" style="font-size:14px;color:${color};letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Key Ideas</h3>
+        ${c.keyIdeas.map(idea=>{
+          // Check if this idea contains example sub-items (lines starting with •)
+          if (idea.includes('\n•')) {
+            const [heading, ...lines] = idea.split('\n');
+            return `<div style="margin-bottom:10px">
+              <div style="display:flex;gap:10px;margin-bottom:6px"><span style="color:${color};flex-shrink:0;margin-top:2px">→</span><p style="color:#cbd5e1;font-size:13px;line-height:1.6;margin:0;font-weight:600">${heading}</p></div>
+              <div style="margin-left:20px;display:grid;gap:5px">
+                ${lines.map(l=>l.trim()).filter(Boolean).map(l=>`<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:7px;padding:8px 12px;font-size:12px;color:#94a3b8;line-height:1.6">${l.replace(/^•\s*/,'<span style="color:'+color+';font-weight:700;margin-right:6px">→</span>')}</div>`).join('')}
+              </div>
+            </div>`;
+          }
+          return `<div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:${color};flex-shrink:0;margin-top:2px">→</span><p style="color:#cbd5e1;font-size:13px;line-height:1.6;margin:0">${idea}</p></div>`;
+        }).join('')}
+        <h3 class="condensed" style="font-size:14px;color:${color};letter-spacing:.06em;text-transform:uppercase;margin:18px 0 10px">Teaching Progression</h3>
+        ${c.teachingProgression.map((step,i)=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start"><span style="background:${color};color:#000;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</span><p style="color:#cbd5e1;font-size:13px;line-height:1.6;margin:0">${step}</p></div>`).join('')}
+        <div style="margin-top:16px;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 12px">
+          <p style="color:#475569;font-size:11px;margin:0;font-style:italic">📖 ${c.saramaRef}</p>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const filtered = conceptFilter ? CONCEPTS.filter(c=>c.category===conceptFilter) : CONCEPTS;
+  return `
+  <div>
+    <div style="margin-bottom:20px">
+      <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Team Concepts</h2>
+      <p style="color:#475569;font-size:13px">Core ideas from <em style="color:#94a3b8">Transforming Basketball</em> — with how to teach them.</p>
+    </div>
+    <div class="toggle-row" style="margin-bottom:16px">
+      <button class="toggle-btn" style="background:${!conceptFilter?'#e87722':'#1e293b'}" onclick="setState({conceptFilter:''})">All</button>
+      ${cats.map(c=>`<button class="toggle-btn" style="background:${conceptFilter===c?(CAT_COLORS[c]||'#e87722'):'#1e293b'}" onclick="setState({conceptFilter:'${c}'})">${c}</button>`).join('')}
+    </div>
+    <div class="grid2">
+      ${filtered.map(c=>{const color=CAT_COLORS[c.category]||'#e87722';return`
+      <div onclick="setState({conceptSelected:${JSON.stringify(c).replace(/"/g,'&quot;')}})" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px;cursor:pointer;transition:border-color .2s,background .2s" onmouseover="this.style.borderColor='${color}55';this.style.background='rgba(255,255,255,.055)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)';this.style.background='rgba(255,255,255,.03)'">
+        <div style="font-size:20px;margin-bottom:7px">${c.icon}</div>
+        ${badge(c.category,color)}
+        <h3 class="condensed" style="font-size:15px;color:#fff;margin:8px 0 5px">${c.title}</h3>
+        <p style="color:#64748b;font-size:12px;line-height:1.5;margin:0 0 8px">${c.summary.slice(0,80)}…</p>
+        <p style="color:${color};font-size:11px;margin:0">View →</p>
+      </div>`;}).join('')}
+    </div>
+  </div>`;
+}
+
+// ── Main Render ───────────────────────────────────────────────────────────────
+function render() {
+  const { tab, drills, favorites, players, teams, sessions } = state;
+  const tabs = [['plan','Build Plan'],['players','Players'],['teams','Teams'],['library','Drill Library'],['concepts','Concepts']];
+
+  document.getElementById('app').innerHTML = `
+  <div style="background:linear-gradient(180deg,#0d1b2e 0%,#060d18 100%);border-bottom:1px solid #1e293b;padding:0 20px">
+    <div style="max-width:780px;margin:0 auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:28px;height:28px;border-radius:7px;background:#e87722;display:flex;align-items:center;justify-content:center;font-size:15px">🏀</div>
+            <span class="condensed" style="font-size:22px;font-weight:800;color:#fff;letter-spacing:.04em">COURTCRAFT</span>
+          </div>
+          <p style="color:#334155;font-size:10px;margin:2px 0 0 10px;letter-spacing:.07em;text-transform:uppercase">Smart Practice Planner</p>
+        </div>
+        <div style="font-size:10px;color:#334155;text-align:right;line-height:1.7">
+          <div>${players.length} players · ${teams.length} teams</div>
+          <div>${drills.length} drills · ${sessions.length} sessions</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0;overflow-x:auto">
+        ${tabs.map(([key,label])=>`<button class="tab-btn ${tab===key?'active':''}" onclick="setState({tab:'${key}'})">${label}</button>`).join('')}
+      </div>
+    </div>
+  </div>
+  <div style="max-width:780px;margin:0 auto;padding:22px 20px 60px">
+    ${tab==='plan'?renderPlanWizard():''}
+    ${tab==='players'?renderPlayers():''}
+    ${tab==='teams'?renderTeams():''}
+    ${tab==='library'?renderLibrary():''}
+    ${tab==='concepts'?renderConcepts():''}
+  </div>`;
+}
+
+// ── Event Handlers ────────────────────────────────────────────────────────────
+function toggleDrillExpand(id) {
+  const el = document.getElementById('dc_'+id);
+  if (el) el.style.display = el.style.display==='none'?'block':'none';
+}
+function toggleFav(id) {
+  state.favorites = state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites,id];
+  persist(); render();
+}
+function togglePlanFocus(id) {
+  state.planFocus = state.planFocus.includes(id) ? state.planFocus.filter(x=>x!==id) : [...state.planFocus, id];
+  const pills = document.querySelectorAll('[data-plan-skill]');
+  if (pills.length > 0) {
+    pills.forEach(btn => {
+      const sid = btn.getAttribute('data-plan-skill');
+      const on = state.planFocus.includes(sid);
+      btn.style.background = on ? '#e87722' : '#1e293b';
+      btn.style.borderColor = on ? '#e87722' : '#334155';
+      btn.style.color = on ? '#fff' : '#64748b';
+      btn.style.fontWeight = on ? 700 : 400;
+    });
+  } else { render(); }
+}
+function togglePlanPlayer(pid) { state.planPlayerIds = state.planPlayerIds.includes(pid)?state.planPlayerIds.filter(x=>x!==pid):[...state.planPlayerIds,pid]; render(); }
+function buildPlan() { state.generatedPlan = generatePlan(); state.planSaved = false; state.planStep = 1; render(); }
+function saveSession() {
+  const plan = state.generatedPlan;
+  const { planMode, planTeamId, planPlayerIds, planDuration, planFocus, teams } = state;
+  const session = {
+    id: uid('s'), planTitle: plan.title, date: today(),
+    duration: planDuration, focus: planFocus, notes: plan.coachNotes||'',
+    teamId: planMode==='team'?planTeamId:null,
+    playerIds: planMode==='team'?(teams.find(t=>t.id===planTeamId)?.playerIds||[]):planPlayerIds,
+  };
+  state.sessions = [...state.sessions, session];
+  state.planSaved = true;
+  persist(); render();
+}
+function copyPlan() {
+  const plan = state.generatedPlan;
+  if (!plan) return;
+  const text = plan.sections.map(s=>`## ${s.title} (${s.duration}min)\n${s.drills.map(d=>`- ${d.name}: ${d.description}\n  Cues: ${d.coachingCues.filter(Boolean).join(', ')}`).join('\n')}`).join('\n\n');
+  navigator.clipboard.writeText(`PRACTICE PLAN — ${plan.title}\n\n${text}`).then(()=>{
+    const btn = document.querySelector('[onclick="copyPlan()"]');
+    if (btn) { btn.textContent='✓ Copied'; setTimeout(()=>{btn.textContent='Copy Plan';},2000); }
+  });
+}
+
+// Players
+function newPlayer() { state.playerForm={id:uid('p'),name:'',age:'',level:'intermediate',position:'',notes:[]}; state.playerView='form'; state.selectedPlayer=null; render(); }
+function openPlayer(id) { state.selectedPlayer=state.players.find(p=>p.id===id); state.playerView='detail'; render(); }
+function editPlayer(id) { const p=state.players.find(x=>x.id===id); state.playerForm={...p,_edit:true}; state.playerView='form'; render(); }
+function deletePlayer(id) {  state.players=state.players.filter(p=>p.id!==id); state.playerView='list'; state.selectedPlayer=null; persist(); render(); }
+function savePlayer() {
+  const name=document.getElementById('pf-name').value.trim();
+  if(!name) return;
+  const p={...(state.playerForm||{}), name, age:+document.getElementById('pf-age').value||'', level:document.getElementById('pf-level').value};
+  if(p._edit){delete p._edit; state.players=state.players.map(x=>x.id===p.id?p:x); state.selectedPlayer=p;}
+  else state.players=[...state.players,p];
+  state.playerView='list'; state.playerForm=null; persist(); render();
+}
+
+// Teams
+function newTeam() { state.teamForm={id:uid('t'),name:'',ageGroup:'',level:'intermediate',playerIds:[],notes:[]}; state.teamView='form'; state.selectedTeam=null; state.pickingPlayers=false; render(); }
+function openTeam(id) { state.selectedTeam=state.teams.find(t=>t.id===id); state.teamView='detail'; render(); }
+function editTeam(id) { const t=state.teams.find(x=>x.id===id); state.teamForm={...t,_edit:true}; state.teamView='form'; state.pickingPlayers=false; render(); }
+function deleteTeam(id) {  state.teams=state.teams.filter(t=>t.id!==id); state.teamView='list'; state.selectedTeam=null; persist(); render(); }
+function toggleTeamPlayer(pid) { const f=state.teamForm; if(!f)return; f.playerIds=f.playerIds.includes(pid)?f.playerIds.filter(x=>x!==pid):[...f.playerIds,pid]; render(); }
+function saveTeam() {
+  const name=document.getElementById('tf-name').value.trim();
+  if(!name) return;
+  const t={...(state.teamForm||{}), name, ageGroup:document.getElementById('tf-age').value, level:document.getElementById('tf-level').value};
+  if(t._edit){delete t._edit; state.teams=state.teams.map(x=>x.id===t.id?t:x); state.selectedTeam=t;}
+  else state.teams=[...state.teams,t];
+  state.teamView='list'; state.teamForm=null; state.pickingPlayers=false; persist(); render();
+}
+
+// Notes
+let _noteForm = {};
+function showNoteForm(entityId, entityType) {
+  _noteForm = {entityId, entityType, id:uid('n'), title:'', category:'Strength', content:''};
+  const container = document.getElementById('note-form-'+entityId);
+  if (!container) return;
+  container.style.display='block';
+  container.innerHTML = renderNoteFormHTML(_noteForm);
+}
+function editNote(entityId, entityType, noteId) {
+  const entity = entityType==='player' ? state.players.find(p=>p.id===entityId) : state.teams.find(t=>t.id===entityId);
+  const n = (entity?.notes||[]).find(x=>x.id===noteId);
+  if (!n) return;
+  _noteForm = {...n, entityId, entityType, _edit:true};
+  const container = document.getElementById('note-form-'+entityId);
+  if (!container) { render(); return; }
+  container.style.display='block';
+  container.innerHTML = renderNoteFormHTML(_noteForm);
+}
+function renderNoteFormHTML(f) {
+  return `<div style="background:#0a1628;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:10px">
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
+      ${['Strength','Weakness','General'].map(c=>`<button class="toggle-btn" style="background:${(f.category||'Strength')===c?noteCatColor(c):'#1e293b'};font-size:10px;padding:3px 8px" onclick="setNoteCategory('${c}')">${c}</button>`).join('')}
+    </div>
+    <input id="nf-title" style="margin-bottom:6px" placeholder="Title / observation" value="${f.title||''}"/>
+    <textarea id="nf-content" style="height:56px;margin-bottom:8px" placeholder="Details…">${f.content||''}</textarea>
+    <div style="display:flex;gap:6px">
+      <button class="btn" style="background:#e87722;padding:5px 14px;font-size:12px" onclick="saveNote()">Save</button>
+      <button class="btn" style="background:#334155;padding:5px 12px;font-size:12px" onclick="cancelNote()">Cancel</button>
+    </div>
+  </div>`;
+}
+function setNoteCategory(cat) {
+  _noteForm.category = cat;
+  const container = document.getElementById('note-form-'+_noteForm.entityId);
+  if (container) container.innerHTML = renderNoteFormHTML(_noteForm);
+}
+function saveNote() {
+  const title = document.getElementById('nf-title')?.value?.trim();
+  if (!title) return;
+  const note = {..._noteForm, title, content: document.getElementById('nf-content')?.value||'', date: today()};
+  const {entityId, entityType, _edit} = note;
+  delete note.entityId; delete note.entityType; delete note._edit;
+  if (entityType==='player') {
+    state.players = state.players.map(p => p.id===entityId ? {...p, notes: _edit?(p.notes||[]).map(n=>n.id===note.id?note:n):[...(p.notes||[]),note]} : p);
+    state.selectedPlayer = state.players.find(p=>p.id===entityId)||state.selectedPlayer;
+  } else {
+    state.teams = state.teams.map(t => t.id===entityId ? {...t, notes: _edit?(t.notes||[]).map(n=>n.id===note.id?note:n):[...(t.notes||[]),note]} : t);
+    state.selectedTeam = state.teams.find(t=>t.id===entityId)||state.selectedTeam;
+  }
+  _noteForm = {};
+  persist(); render();
+}
+function cancelNote() { _noteForm={}; render(); }
+
+function setSkillRating(entityId, entityType, skillId, rating) {
+  const skill = SKILLS().find(s => s.id === skillId);
+  if (!skill) return;
+  const updateEntity = (entity) => {
+    const notes = (entity.notes||[]).filter(n => n._skill !== skillId); // remove existing rating
+    const newNote = {
+      id: uid('n'), _skill: skillId, rating,
+      category: rating === 'weakness' ? 'Weakness' : rating === 'strength' ? 'Strength' : 'Mid',
+      title: skill.label, note: '', focusTag: skill.focusTag, date: today()
+    };
+    return { ...entity, notes: [...notes, newNote] };
+  };
+  if (entityType === 'player') {
+    state.players = state.players.map(p => p.id===entityId ? updateEntity(p) : p);
+    if (state.selectedPlayer?.id === entityId) state.selectedPlayer = state.players.find(p=>p.id===entityId);
+  } else {
+    state.teams = state.teams.map(t => t.id===entityId ? updateEntity(t) : t);
+    if (state.selectedTeam?.id === entityId) state.selectedTeam = state.teams.find(t=>t.id===entityId);
+  }
+  persist(); render();
+}
+
+function clearSkillRating(entityId, entityType, skillId) {
+  const updateEntity = (entity) => ({ ...entity, notes: (entity.notes||[]).filter(n => n._skill !== skillId) });
+  if (entityType === 'player') {
+    state.players = state.players.map(p => p.id===entityId ? updateEntity(p) : p);
+    if (state.selectedPlayer?.id === entityId) state.selectedPlayer = state.players.find(p=>p.id===entityId);
+  } else {
+    state.teams = state.teams.map(t => t.id===entityId ? updateEntity(t) : t);
+    if (state.selectedTeam?.id === entityId) state.selectedTeam = state.teams.find(t=>t.id===entityId);
+  }
+  persist(); render();
+}
+
+function updateSkillNote(entityId, entityType, skillId, noteText) {
+  const updateEntity = (entity) => ({
+    ...entity,
+    notes: (entity.notes||[]).map(n => n._skill === skillId ? {...n, note: noteText} : n)
+  });
+  if (entityType === 'player') {
+    state.players = state.players.map(p => p.id===entityId ? updateEntity(p) : p);
+    if (state.selectedPlayer?.id === entityId) state.selectedPlayer = state.players.find(p=>p.id===entityId);
+  } else {
+    state.teams = state.teams.map(t => t.id===entityId ? updateEntity(t) : t);
+    if (state.selectedTeam?.id === entityId) state.selectedTeam = state.teams.find(t=>t.id===entityId);
+  }
+  // Don't re-render (user is typing) — just persist
+  persist();
+}
+
+// Legacy toggleAttr kept for backwards compatibility
+function toggleAttr(entityId, entityType, attrId) {
+  const attr = ATTRIBUTES().find(a => a.id === attrId);
+  if (attr) setSkillRating(entityId, entityType, attrId, 'weakness');
+}
+
+function togglePlanFocus(id) {
+  state.planFocus = state.planFocus.includes(id) ? state.planFocus.filter(x=>x!==id) : [...state.planFocus, id];
+  const pills = document.querySelectorAll('[data-plan-skill]');
+  if (pills.length > 0) {
+    pills.forEach(btn => {
+      const sid = btn.getAttribute('data-plan-skill');
+      const on = state.planFocus.includes(sid);
+      btn.style.background = on ? '#e87722' : '#1e293b';
+      btn.style.borderColor = on ? '#e87722' : '#334155';
+      btn.style.color = on ? '#fff' : '#64748b';
+      btn.style.fontWeight = on ? 700 : 400;
+    });
+  } else { render(); }
+}
+function togglePlanPlayer(pid) { state.planPlayerIds = state.planPlayerIds.includes(pid)?state.planPlayerIds.filter(x=>x!==pid):[...state.planPlayerIds,pid]; render(); }
+function buildPlan() { state.generatedPlan = generatePlan(); state.planSaved = false; state.planStep = 1; render(); }
+function saveSession() {
+  const plan = state.generatedPlan;
+  const { planMode, planTeamId, planPlayerIds, planDuration, planFocus, teams } = state;
+  const session = {
+    id: uid('s'), planTitle: plan.title, date: today(),
+    duration: planDuration, focus: planFocus, notes: plan.coachNotes||'',
+    teamId: planMode==='team'?planTeamId:null,
+    playerIds: planMode==='team'?(teams.find(t=>t.id===planTeamId)?.playerIds||[]):planPlayerIds,
+  };
+  state.sessions = [...state.sessions, session];
+  state.planSaved = true;
+  persist(); render();
+}
+function copyPlan() {
+  const plan = state.generatedPlan;
+  if (!plan) return;
+  const text = plan.sections.map(s=>`## ${s.title} (${s.duration}min)\n${s.drills.map(d=>`- ${d.name}: ${d.description}\n  Cues: ${d.coachingCues.filter(Boolean).join(', ')}`).join('\n')}`).join('\n\n');
+  navigator.clipboard.writeText(`PRACTICE PLAN — ${plan.title}\n\n${text}`).then(()=>{
+    const btn = document.querySelector('[onclick="copyPlan()"]');
+    if (btn) { btn.textContent='✓ Copied'; setTimeout(()=>{btn.textContent='Copy Plan';},2000); }
+  });
+}
+
+// Players
+function newPlayer() { state.playerForm={id:uid('p'),name:'',age:'',level:'intermediate',position:'',notes:[]}; state.playerView='form'; state.selectedPlayer=null; render(); }
+function openPlayer(id) { state.selectedPlayer=state.players.find(p=>p.id===id); state.playerView='detail'; render(); }
+function editPlayer(id) { const p=state.players.find(x=>x.id===id); state.playerForm={...p,_edit:true}; state.playerView='form'; render(); }
+function deletePlayer(id) {  state.players=state.players.filter(p=>p.id!==id); state.playerView='list'; state.selectedPlayer=null; persist(); render(); }
+function savePlayer() {
+  const name=document.getElementById('pf-name').value.trim();
+  if(!name) return;
+  const p={...(state.playerForm||{}), name, age:+document.getElementById('pf-age').value||'', level:document.getElementById('pf-level').value};
+  if(p._edit){delete p._edit; state.players=state.players.map(x=>x.id===p.id?p:x); state.selectedPlayer=p;}
+  else state.players=[...state.players,p];
+  state.playerView='list'; state.playerForm=null; persist(); render();
+}
+
+// Teams
+function newTeam() { state.teamForm={id:uid('t'),name:'',ageGroup:'',level:'intermediate',playerIds:[],notes:[]}; state.teamView='form'; state.selectedTeam=null; state.pickingPlayers=false; render(); }
+function openTeam(id) { state.selectedTeam=state.teams.find(t=>t.id===id); state.teamView='detail'; render(); }
+function editTeam(id) { const t=state.teams.find(x=>x.id===id); state.teamForm={...t,_edit:true}; state.teamView='form'; state.pickingPlayers=false; render(); }
+function deleteTeam(id) {  state.teams=state.teams.filter(t=>t.id!==id); state.teamView='list'; state.selectedTeam=null; persist(); render(); }
+function toggleTeamPlayer(pid) { const f=state.teamForm; if(!f)return; f.playerIds=f.playerIds.includes(pid)?f.playerIds.filter(x=>x!==pid):[...f.playerIds,pid]; render(); }
+function saveTeam() {
+  const name=document.getElementById('tf-name').value.trim();
+  if(!name) return;
+  const t={...(state.teamForm||{}), name, ageGroup:document.getElementById('tf-age').value, level:document.getElementById('tf-level').value};
+  if(t._edit){delete t._edit; state.teams=state.teams.map(x=>x.id===t.id?t:x); state.selectedTeam=t;}
+  else state.teams=[...state.teams,t];
+  state.teamView='list'; state.teamForm=null; state.pickingPlayers=false; persist(); render();
+}
+
+// Notes
+_noteForm = {};
+function showNoteForm(entityId, entityType) {
+  _noteForm = {entityId, entityType, id:uid('n'), title:'', category:'Strength', content:''};
+  const container = document.getElementById('note-form-'+entityId);
+  if (!container) return;
+  container.style.display='block';
+  container.innerHTML = renderNoteFormHTML(_noteForm);
+}
+function editNote(entityId, entityType, noteId) {
+  const entity = entityType==='player' ? state.players.find(p=>p.id===entityId) : state.teams.find(t=>t.id===entityId);
+  const n = (entity?.notes||[]).find(x=>x.id===noteId);
+  if (!n) return;
+  _noteForm = {...n, entityId, entityType, _edit:true};
+  const container = document.getElementById('note-form-'+entityId);
+  if (!container) { render(); return; }
+  container.style.display='block';
+  container.innerHTML = renderNoteFormHTML(_noteForm);
+}
+function renderNoteFormHTML(f) {
+  return `<div style="background:#0a1628;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:10px">
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
+      ${['Strength','Weakness','General'].map(c=>`<button class="toggle-btn" style="background:${(f.category||'Strength')===c?noteCatColor(c):'#1e293b'};font-size:10px;padding:3px 8px" onclick="setNoteCategory('${c}')">${c}</button>`).join('')}
+    </div>
+    <input id="nf-title" style="margin-bottom:6px" placeholder="Title / observation" value="${f.title||''}"/>
+    <textarea id="nf-content" style="height:56px;margin-bottom:8px" placeholder="Details…">${f.content||''}</textarea>
+    <div style="display:flex;gap:6px">
+      <button class="btn" style="background:#e87722;padding:5px 14px;font-size:12px" onclick="saveNote()">Save</button>
+      <button class="btn" style="background:#334155;padding:5px 12px;font-size:12px" onclick="cancelNote()">Cancel</button>
+    </div>
+  </div>`;
+}
+function setNoteCategory(cat) {
+  _noteForm.category = cat;
+  const container = document.getElementById('note-form-'+_noteForm.entityId);
+  if (container) container.innerHTML = renderNoteFormHTML(_noteForm);
+}
+function saveNote() {
+  const title = document.getElementById('nf-title')?.value?.trim();
+  if (!title) return;
+  const note = {..._noteForm, title, content: document.getElementById('nf-content')?.value||'', date: today()};
+  const {entityId, entityType, _edit} = note;
+  delete note.entityId; delete note.entityType; delete note._edit;
+  if (entityType==='player') {
+    state.players = state.players.map(p => p.id===entityId ? {...p, notes: _edit?(p.notes||[]).map(n=>n.id===note.id?note:n):[...(p.notes||[]),note]} : p);
+    state.selectedPlayer = state.players.find(p=>p.id===entityId)||state.selectedPlayer;
+  } else {
+    state.teams = state.teams.map(t => t.id===entityId ? {...t, notes: _edit?(t.notes||[]).map(n=>n.id===note.id?note:n):[...(t.notes||[]),note]} : t);
+    state.selectedTeam = state.teams.find(t=>t.id===entityId)||state.selectedTeam;
+  }
+  _noteForm = {};
+  persist(); render();
+}
+function cancelNote() { _noteForm={}; render(); }
+
+function toggleAttr(entityId, entityType, attrId) {
+  const attr = ATTRIBUTES().find(a => a.id === attrId);
+  if (!attr) return;
+  const updateEntity = (entity) => {
+    const notes = entity.notes || [];
+    const exists = notes.find(n => n._attr === attrId);
+    if (exists) {
+      return { ...entity, notes: notes.filter(n => n._attr !== attrId) };
+    } else {
+      return { ...entity, notes: [...notes, {
+        id: uid('n'), _attr: attrId, category: attr.type==='weakness'?'Weakness':'Strength',
+        title: attr.label, content: '', date: today(), focusTag: attr.focusTag
+      }]};
+    }
+  };
+  if (entityType === 'player') {
+    state.players = state.players.map(p => p.id===entityId ? updateEntity(p) : p);
+    if (state.selectedPlayer?.id === entityId) state.selectedPlayer = state.players.find(p=>p.id===entityId);
+  } else {
+    state.teams = state.teams.map(t => t.id===entityId ? updateEntity(t) : t);
+    if (state.selectedTeam?.id === entityId) state.selectedTeam = state.teams.find(t=>t.id===entityId);
+  }
+  persist(); render();
+}
+function deleteNote(entityId, entityType, noteId) {
+  if (entityType==='player') { state.players=state.players.map(p=>p.id===entityId?{...p,notes:(p.notes||[]).filter(n=>n.id!==noteId)}:p); state.selectedPlayer=state.players.find(p=>p.id===entityId)||state.selectedPlayer; }
+  else { state.teams=state.teams.map(t=>t.id===entityId?{...t,notes:(t.notes||[]).filter(n=>n.id!==noteId)}:t); state.selectedTeam=state.teams.find(t=>t.id===entityId)||state.selectedTeam; }
+  persist(); render();
+}
+
+// Drills
+function newDrill() { state.editDrill=null; state.showDrillForm=true; _drillFormState={}; render(); }
+function editDrill(id) { state.editDrill=state.drills.find(d=>d.id===id); state.showDrillForm=false; _drillFormState={}; render(); }
+function deleteDrill(id) {  state.drills=state.drills.filter(d=>d.id!==id); persist(); render(); }
+let _drillFormState = {};
+function _getDrillFormBase() {
+  return state.editDrill||{id:uid('d'),name:'',source:'',ageMin:8,ageMax:16,levels:[],duration:8,focus:[],description:'',coachingCues:['','',''],format:'game',players:6};
+}
+function _snapshotDrillFormDOM() {
+  const g = id => document.getElementById(id);
+  if (!g('df-name')) return;
+  _drillFormState = {
+    ..._getDrillFormBase(), ..._drillFormState,
+    name:    g('df-name')?.value||'',
+    source:  g('df-source')?.value||'',
+    ageMin:  +g('df-amin')?.value||6,
+    ageMax:  +g('df-amax')?.value||18,
+    duration:+g('df-dur')?.value||8,
+    players: +g('df-players')?.value||1,
+    description: g('df-desc')?.value||'',
+    coachingCues:[g('df-c0')?.value||'',g('df-c1')?.value||'',g('df-c2')?.value||''],
+  };
+}
+function setDrillPhase(phase) {
+  _snapshotDrillFormDOM();
+  _drillFormState = {..._getDrillFormBase(), ..._drillFormState, phase};
+  render();
+}
+function setDrillFormat(fmt) {
+  _snapshotDrillFormDOM();
+  _drillFormState = {..._getDrillFormBase(), ..._drillFormState, format: fmt};
+  // Just update the format buttons in place
+  document.querySelectorAll('[id^="df-fmt-"]').forEach(b =>
+    b.style.background = (b.id === 'df-fmt-'+fmt ? '#e87722' : '#1e293b')
+  );
+}
+function toggleDrillLevel(l) {
+  _snapshotDrillFormDOM();
+  const base = {..._getDrillFormBase(), ..._drillFormState};
+  const levels = base.levels||[];
+  const newLevels = levels.includes(l) ? levels.filter(x=>x!==l) : [...levels, l];
+  _drillFormState = {...base, levels: newLevels};
+  // Just update the level buttons in place
+  document.querySelectorAll('[id^="df-lvl-"]').forEach(b => {
+    const lv = b.id.replace('df-lvl-','');
+    b.style.background = newLevels.includes(lv) ? (LEVEL_COLORS[lv]||'#e87722') : '#1e293b';
+  });
+}
+function renderDrillSkillsList(focus) {
+  return SKILLS().filter(s => s.focusTag).map(skill => {
+    const on = (focus||[]).includes(skill.id);
+    return `<button
+      onclick="toggleDrillSkill('${skill.id}')"
+      style="background:${on?'#e87722':'#1e293b'};border:1px solid ${on?'#e87722':'#334155'};border-radius:6px;padding:5px 12px;font-size:12px;color:${on?'#fff':'#64748b'};cursor:pointer;font-family:inherit;font-weight:${on?700:400};transition:all .15s"
+    >${skill.label}</button>`;
+  }).join('');
+}
+function toggleDrillFocus(f) { toggleDrillSkill(f); } // legacy
+function toggleDrillSkill(focusTag) {
+  // Snapshot text fields without triggering a full re-render
+  _snapshotDrillFormDOM();
+  const base = {..._getDrillFormBase(), ..._drillFormState};
+  const focus = base.focus||[];
+  const newFocus = focus.includes(focusTag) ? focus.filter(x=>x!==focusTag) : [...focus, focusTag];
+  _drillFormState = {...base, focus: newFocus};
+  // Surgical update — only replace the skills list div, no page re-render
+  const el = document.getElementById('drill-skills-list');
+  if (el) {
+    el.style.display = 'flex';
+    el.style.flexWrap = 'wrap';
+    el.style.gap = '6px';
+    el.innerHTML = renderDrillSkillsList(newFocus);
+  } else {
+    render();
+  }
+}
+function saveDrill() {
+  const name=document.getElementById('df-name')?.value?.trim(); if(!name)return;
+  const base = state.editDrill||{id:uid('d'),levels:[],focus:[],format:'game'};
+  const d = {
+    ...base,
+    name, source:document.getElementById('df-source').value,
+    ageMin:+document.getElementById('df-amin').value||6,
+    ageMax:+document.getElementById('df-amax').value||18,
+    duration:+document.getElementById('df-dur').value||8,
+    players:+document.getElementById('df-players').value||1,
+    description:document.getElementById('df-desc').value,
+    coachingCues:[document.getElementById('df-c0').value,document.getElementById('df-c1').value,document.getElementById('df-c2').value],
+    format: _drillFormState.format||base.format,
+    levels: _drillFormState.levels?.length?_drillFormState.levels:base.levels,
+    focus: _drillFormState.focus?.length?_drillFormState.focus:base.focus,
+    phase: _drillFormState.phase||base.phase||'skill',us,
+  };
+  if(state.editDrill) state.drills=state.drills.map(x=>x.id===d.id?d:x);
+  else state.drills=[...state.drills,d];
+  _drillFormState={}; state.editDrill=null; state.showDrillForm=false; persist(); render();
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// GAMES MODULE — injected after main app
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Quiz Bank ─────────────────────────────────────────────────────
+const QUIZ_BANK = [
+  // Terminology — Screens
+  {id:"q1",category:"Screens",difficulty:"easy",points:100,question:"What do you call a screen set for the ball-handler on the perimeter?",options:["Down Screen","Ball Screen","Flare Screen","Back Screen"],answer:1,explanation:"A ball screen (or pick-and-roll) is set for the player with the ball. The screener then rolls or pops to create a second option."},
+  {id:"q2",category:"Screens",difficulty:"easy",points:100,question:"A screen set away from the ball to free up a shooter moving toward the ball is called a…",options:["Back Screen","Flare Screen","Down Screen","Stagger Screen"],answer:2,explanation:"A down screen is set by a player moving toward the baseline to free a teammate cutting up toward the ball."},
+  {id:"q3",category:"Screens",difficulty:"medium",points:200,question:"Two screens set in sequence for the same cutter are called a…",options:["Double Screen","Stagger Screen","Spain Pick","Horns Action"],answer:1,explanation:"A stagger screen uses two screeners set one after the other. The cutter must read each defender separately to decide how to use them."},
+  {id:"q4",category:"Screens",difficulty:"medium",points:200,question:"A screen set to push a defender toward the baseline — sending the cutter toward the three-point line — is called a…",options:["Down Screen","Curl Screen","Flare Screen","Pin Screen"],answer:2,explanation:"A flare screen sends the cutter away from the ball toward the corner or wing. Used when the defender is sagging or helping."},
+  {id:"q5",category:"Screens",difficulty:"hard",points:300,question:"In a ball screen, if the defender goes over the top of the screen (chases the handler), the screener's best read is usually to…",options:["Roll hard to the basket","Pop to the three-point line","Set another screen","Stay and re-screen"],answer:1,explanation:"If the defender fights over the top, the rim is open. The screener rolls hard to the basket to exploit the space the defender vacated."},
+  // Terminology — Defense
+  {id:"q6",category:"Defense",difficulty:"easy",points:100,question:"What does 'pistols' stance mean in team defense?",options:["Both arms pointing at the ball","One hand pointing to your man, one to the ball","Crouching low with hands up","Fronting your man"],answer:1,explanation:"Pistols is a help-side positioning cue: one hand points to your man, one to the ball — reminding defenders to see both at all times."},
+  {id:"q7",category:"Defense",difficulty:"easy",points:100,question:"What is a 'closeout' in basketball defense?",options:["Blocking a shot from behind","Sprinting to contest a shooter receiving the ball","Switching defensive assignments","Helping on a drive"],answer:1,explanation:"A closeout is when a help defender sprints to contest a shooter who is about to receive the ball. The key is to sprint then chop steps to arrive under control."},
+  {id:"q8",category:"Defense",difficulty:"medium",points:200,question:"'Funneling' in team defense means…",options:["Trapping the ball-handler in the corner","Directing drives toward your help defenders, away from baseline","Overplaying the passing lane","Zone defense rotation"],answer:1,explanation:"Funneling means your on-ball defender positions to steer drives toward the middle of the floor where help defenders are waiting — not toward the baseline where it is harder to help."},
+  {id:"q9",category:"Defense",difficulty:"hard",points:300,question:"Help-side defense requires you to be positioned so you can see both the ball and your man. How far off the lane line should you typically be when one pass away?",options:["On the lane line","Halfway between your man and the ball","One step off the lane line toward your man","In the paint"],answer:2,explanation:"One pass away, defenders play denial — one step off the lane toward their man, still able to see the ball. Two passes away they drop to help position."},
+  // CLA / Sarama Concepts
+  {id:"q10",category:"Game Concepts",difficulty:"easy",points:100,question:"In Alex Sarama's shot quality framework, what is a 'Gold Medal' shot?",options:["Any three-pointer","A layup or dunk from an offensive advantage","A wide-open mid-range shot","A post-up from the block"],answer:1,explanation:"Gold Medal shots are layups or dunks created from a genuine offensive advantage — when the defense is outnumbered or out of position. These should always be taken."},
+  {id:"q11",category:"Game Concepts",difficulty:"easy",points:100,question:"In CLA (Constraints-Led Approach) coaching, what is a 'constraint'?",options:["A defensive scheme","A rule or condition that changes how the game is played to encourage learning","A physical limitation on a player","A set play designed by the coach"],answer:1,explanation:"A constraint is a rule or condition added to a drill or game (e.g. no dribbling, must pass 3 times before scoring) that shapes how players move and make decisions without direct instruction."},
+  {id:"q12",category:"Game Concepts",difficulty:"medium",points:200,question:"What is a 'trigger' in Sarama's offensive framework?",options:["A set play called by the coach","A defensive condition that creates an offensive opportunity","The first pass of a possession","A screen action that starts the offense"],answer:1,explanation:"A trigger is a defensive condition — like an over-help, a poor closeout, or a turned head — that signals an opportunity. Players are trained to read triggers and respond with the correct action."},
+  {id:"q13",category:"Game Concepts",difficulty:"medium",points:200,question:"What is the 'domino effect' in basketball offense?",options:["Running the same play repeatedly","Passing quickly around the perimeter","When one action creates a chain of subsequent advantages","Setting multiple screens in sequence"],answer:2,explanation:"The domino effect describes how one offensive action (e.g. a drive) collapses the defense and creates a second advantage (open corner shooter), which creates a third, and so on."},
+  {id:"q14",category:"Game Concepts",difficulty:"hard",points:300,question:"In representative practice design, what makes a drill 'representative'?",options:["It has a large number of repetitions","It closely resembles the perceptual and decision-making demands of the real game","It uses full-court 5v5","It involves the coach providing constant feedback"],answer:1,explanation:"Representative practice means the drill preserves the key information sources and decisions players face in the game. Isolated ball-handling drills are not representative; 3v3 with live defense is."},
+  // Cuts & Reads
+  {id:"q15",category:"Cuts & Reads",difficulty:"easy",points:100,question:"If your defender turns their head to watch the ball, what cut should you make immediately?",options:["L-cut to the wing","Flare cut to the corner","Backdoor cut to the basket","V-cut to the elbow"],answer:2,explanation:"When a defender loses sight of you to watch the ball, that is the trigger to go backdoor immediately. The pass and cut must be timed together."},
+  {id:"q16",category:"Cuts & Reads",difficulty:"easy",points:100,question:"An L-cut involves setting up your defender…",options:["On the baseline before cutting to the wing","High on the perimeter before cutting sharply to a lower catch point","In the post before cutting to the three-point line","On the ball-side before cutting away"],answer:1,explanation:"An L-cut means walking your defender up high (toward the elbow), then cutting sharply low to receive the ball at a lower position. The change of direction creates separation."},
+  {id:"q17",category:"Cuts & Reads",difficulty:"medium",points:200,question:"You pass to a teammate and your defender immediately turns to watch the ball. What action should you take?",options:["Spot up in the corner","Set a screen for another teammate","Give-and-go — cut to the basket immediately","Back-screen the nearest defender"],answer:2,explanation:"The give-and-go: after passing, if the defender watches the ball, cut immediately to the basket. This is one of the oldest and most effective reads in basketball."},
+  {id:"q18",category:"Cuts & Reads",difficulty:"hard",points:300,question:"Coming off an off-ball screen, your defender fights through (chases you over the top). What is the correct read?",options:["Fade to the corner or three-point line","Curl tight around the screen toward the basket","Pop straight back to re-screen","Set a new screen for the ball-handler"],answer:0,explanation:"If the defender fights over the top, they are momentum-committed. Fading away from the screen — to the corner or back to the three-point line — puts maximum distance between you and the defender."},
+  // Basketball History
+  {id:"q19",category:"History",difficulty:"easy",points:100,question:"Who invented basketball?",options:["James Naismith","Bill Russell","John Wooden","Wilt Chamberlain"],answer:0,explanation:"Dr. James Naismith invented basketball in December 1891 in Springfield, Massachusetts. He nailed two peach baskets to an elevated track and wrote 13 original rules."},
+  {id:"q20",category:"History",difficulty:"easy",points:100,question:"How many points did Wilt Chamberlain score in his record single-game performance in 1962?",options:["81","100","78","68"],answer:1,explanation:"Wilt Chamberlain scored 100 points for the Philadelphia Warriors against the New York Knicks on March 2, 1962 — still the all-time NBA single-game record."},
+  {id:"q21",category:"History",difficulty:"medium",points:200,question:"Which team won the first NBA championship in 1947?",options:["Boston Celtics","Philadelphia Warriors","Minneapolis Lakers","Chicago Bulls"],answer:1,explanation:"The Philadelphia Warriors won the first BAA (which became the NBA) championship in 1947, defeating the Chicago Stags 4 games to 1."},
+  {id:"q22",category:"History",difficulty:"medium",points:200,question:"Which player was known as 'The Mailman' for his consistent delivery in big moments?",options:["Charles Barkley","Patrick Ewing","Karl Malone","Dominique Wilkins"],answer:2,explanation:"Karl Malone of the Utah Jazz earned the nickname 'The Mailman' because he always delivered. He is second on the all-time NBA scoring list with 36,928 points."},
+  {id:"q23",category:"History",difficulty:"hard",points:300,question:"The three-point line was introduced to the NBA in which season?",options:["1976-77","1979-80","1983-84","1971-72"],answer:1,explanation:"The NBA adopted the three-point line in the 1979-80 season. It had been used in the ABA since 1967, and was adopted by FIBA in 1984."},
+  {id:"q24",category:"History",difficulty:"hard",points:300,question:"Michael Jordan's famous 'Flu Game' in the 1997 NBA Finals was against which team?",options:["Los Angeles Lakers","New York Knicks","Utah Jazz","Indiana Pacers"],answer:2,explanation:"Jordan scored 38 points despite severe illness in Game 5 of the 1997 NBA Finals against the Utah Jazz. The Bulls won the game and eventually the series 4-2."},
+  // Situational IQ
+  {id:"q25",category:"Situational IQ",difficulty:"medium",points:200,question:"You catch the ball on the wing. The defender closes out hard and off-balance. What is the first read?",options:["Shoot immediately","Drive past the off-balance defender","Pass to the corner","Call a timeout"],answer:1,explanation:"An off-balance closeout is a momentum advantage. Drive past the defender before they can reset. A controlled drive creates a gold medal opportunity or collapses the defense."},
+  {id:"q26",category:"Situational IQ",difficulty:"medium",points:200,question:"Your team is down 2 with 8 seconds left and no timeouts. You have the ball at half-court. What is the priority?",options:["Push for a three-pointer immediately","Get to the basket for a layup or foul","Run a designed play","Call a timeout"],answer:1,explanation:"Down 2 with no timeouts, the priority is getting to the basket — a layup ties it, a foul gives two free throws to tie or win. A three is a lower percentage shot under pressure."},
+  {id:"q27",category:"Situational IQ",difficulty:"hard",points:300,question:"In a 2v1 fast break, the ball-handler drives toward the basket. The lone defender drops to protect the rim. What is the correct read?",options:["Continue driving for the layup","Pull up for a mid-range jumper","Pass to the trailing teammate for an open shot","Drive and dish only if the defender fully commits"],answer:3,explanation:"Read the defender. If they fully commit to stopping the drive, pass. If they hedge or stay back, take the layup. The decision must be based on what the defense gives — not pre-planned."},
+  {id:"q28",category:"Situational IQ",difficulty:"easy",points:100,question:"What does 'spacing' mean in basketball offense?",options:["Running plays in tight spaces","Positioning players so defenders cannot guard two threats at once","Keeping all players close together","Spreading to all five positions on the court"],answer:1,explanation:"Spacing means positioning offensive players so that any single defender cannot simultaneously guard their player and help on a drive. Good spacing stretches the defense and creates driving lanes."},
+];
+
+// ── Games State ───────────────────────────────────────────────────
+const gState = {
+  // Spin wheel
+  spinning: false,
+  spinResult: null,
+  spinAngle: 0,
+  wheelFilter: 'all', // all | drills | quiz
+  // Quiz
+  activeQuiz: null,
+  quizAnswered: false,
+  quizSelected: null,
+  quizFilter: 'all',
+  // Session scoreboard
+  sessionScores: load('gScores', {}), // {playerId: points}
+  sessionLog: load('gLog', []), // [{playerId, playerName, points, reason, time}]
+  awardingTo: null, // playerId being awarded points manually
+  // Challenges
+  challengeFilter: 'all',
+};
+
+function saveGames() {
+  save('gScores', gState.sessionScores);
+  save('gLog', gState.sessionLog);
+}
+
+// ── Wheel Items Builder ───────────────────────────────────────────
+function buildWheelItems() {
+  const drills = state.drills.filter(d => {
+    if (gState.wheelFilter === 'quiz') return false;
+    return d.levels.includes(state.planLevel || 'intermediate');
+  });
+  const quizItem = gState.wheelFilter === 'drills' ? [] : [
+    { id:'quiz-easy', name:'Quick Quiz', icon:'🧠', type:'quiz', difficulty:'easy', color:'#06b6d4' },
+    { id:'quiz-med', name:'Brain Test', icon:'🧩', type:'quiz', difficulty:'medium', color:'#8b5cf6' },
+    { id:'quiz-hard', name:'Expert Quiz', icon:'🏆', type:'quiz', difficulty:'hard', color:'#f59e0b' },
+  ];
+  const drillItems = drills.slice(0, 8).map(d => ({ id:d.id, name:d.name, icon:d.format==='game'?'🏀':'⚙️', type:'drill', color:'#e87722', drill:d }));
+  return [...drillItems, ...quizItem].slice(0, 10);
+}
+
+// ── Render Games Tab ──────────────────────────────────────────────
+function renderGames() {
+  return `
+  <div>
+    <div style="margin-bottom:20px">
+      <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Games & Challenges</h2>
+      <p style="color:#475569;font-size:13px">Spin the wheel, test basketball IQ, and track player points.</p>
+    </div>
+
+    <!-- Section nav -->
+    <div class="toggle-row" style="margin-bottom:24px">
+      <button class="toggle-btn" id="gsec-wheel" style="background:${gState.gameSection==='wheel'||!gState.gameSection?'#e87722':'#1e293b'};padding:7px 16px;font-size:12px" onclick="setGameSection('wheel')">🎡 Spin the Wheel</button>
+      <button class="toggle-btn" id="gsec-quiz" style="background:${gState.gameSection==='quiz'?'#e87722':'#1e293b'};padding:7px 16px;font-size:12px" onclick="setGameSection('quiz')">🧠 IQ Quiz</button>
+      <button class="toggle-btn" id="gsec-scores" style="background:${gState.gameSection==='scores'?'#e87722':'#1e293b'};padding:7px 16px;font-size:12px" onclick="setGameSection('scores')">🏆 Scoreboard</button>
+    </div>
+
+    <div id="game-content">
+      ${renderGameSection()}
+    </div>
+  </div>`;
+}
+
+function setGameSection(s) {
+  gState.gameSection = s;
+  gState.activeQuiz = null; gState.quizAnswered = false; gState.quizSelected = null;
+  document.getElementById('game-content').innerHTML = renderGameSection();
+  document.querySelectorAll('[id^="gsec-"]').forEach(b=>b.style.background=(b.id==='gsec-'+s?'#e87722':'#1e293b'));
+}
+
+function renderGameSection() {
+  const s = gState.gameSection || 'wheel';
+  if (s === 'wheel') return renderWheel();
+  if (s === 'quiz') return renderQuizSection();
+  if (s === 'scores') return renderScoreboard();
+  return '';
+}
+
+// ── Spin the Wheel ────────────────────────────────────────────────
+function renderWheel() {
+  const items = buildWheelItems();
+  if (items.length < 2) return `<p style="color:#475569;font-size:13px">Add more drills to your library to use the wheel.</p>`;
+  const n = items.length;
+  const arc = 360 / n;
+  const colors = ['#e87722','#3b82f6','#22c55e','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#f97316','#10b981','#ec4899'];
+  const r = 130, cx = 150, cy = 150;
+
+  // SVG wheel slices
+  function polarToCart(angle, radius) {
+    const rad = (angle - 90) * Math.PI / 180;
+    return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
+  }
+  function makeSlice(i) {
+    const startAngle = i * arc;
+    const endAngle = (i + 1) * arc;
+    const start = polarToCart(startAngle, r);
+    const end = polarToCart(endAngle, r);
+    const large = arc > 180 ? 1 : 0;
+    const midAngle = startAngle + arc / 2;
+    const mid = polarToCart(midAngle, r * 0.62);
+    const color = colors[i % colors.length];
+    return `
+      <path d="M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${large} 1 ${end.x} ${end.y} Z" fill="${color}" stroke="#060d18" stroke-width="2"/>
+      <text x="${mid.x}" y="${mid.y}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff" font-family="IBM Plex Sans,sans-serif" font-weight="600" transform="rotate(${midAngle},${mid.x},${mid.y})">${items[i].icon}</text>`;
+  }
+
+  const slices = items.map((_,i) => makeSlice(i)).join('');
+  const result = gState.spinResult;
+
+  return `
+  <div style="text-align:center">
+    <!-- Filter -->
+    <div class="toggle-row" style="justify-content:center;margin-bottom:20px">
+      <span style="color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;align-self:center;margin-right:4px">Include:</span>
+      ${[['all','Drills + Quiz'],['drills','Drills Only'],['quiz','Quiz Only']].map(([v,l])=>`<button class="toggle-btn" style="background:${gState.wheelFilter===v?'#e87722':'#1e293b'};font-size:11px" onclick="setWheelFilter('${v}')">${l}</button>`).join('')}
+    </div>
+
+    <!-- Wheel -->
+    <div style="position:relative;display:inline-block;margin-bottom:20px">
+      <svg id="spin-wheel" width="300" height="300" style="filter:drop-shadow(0 0 20px rgba(232,119,34,0.3));transition:transform 0s">
+        <g id="wheel-slices" style="transform-origin:150px 150px;transform:rotate(${gState.spinAngle}deg)">
+          ${slices}
+          <circle cx="${cx}" cy="${cy}" r="22" fill="#0f172a" stroke="#e87722" stroke-width="3"/>
+          <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#e87722">🏀</text>
+        </g>
+        <!-- Pointer -->
+        <polygon points="${cx},${cy-r-10} ${cx-8},${cy-r+8} ${cx+8},${cy-r+8}" fill="#e87722"/>
+      </svg>
+    </div>
+
+    <!-- Spin button -->
+    <div style="margin-bottom:20px">
+      <button onclick="spinWheel()" ${gState.spinning?'disabled':''} style="background:${gState.spinning?'#334155':'#e87722'};color:#fff;border:none;border-radius:10px;padding:13px 36px;font-size:16px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:${gState.spinning?'not-allowed':'pointer'}">
+        ${gState.spinning?'Spinning…':'🎡 Spin!'}
+      </button>
+    </div>
+
+    <!-- Result -->
+    ${result ? renderSpinResult(result) : '<p style="color:#334155;font-size:13px">Spin to select the next drill or challenge!</p>'}
+  </div>`;
+}
+
+function renderSpinResult(item) {
+  if (item.type === 'quiz') {
+    return `
+    <div style="background:rgba(255,255,255,.03);border:1px solid ${item.color}44;border-radius:12px;padding:20px;text-align:left;max-width:500px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:24px">${item.icon}</span>
+        <div>
+          <span class="badge" style="background:${item.color}22;color:${item.color};border:1px solid ${item.color}44">${item.difficulty} quiz</span>
+          <h3 class="condensed" style="font-size:18px;color:#fff;margin:4px 0 0">${item.name}</h3>
+        </div>
+      </div>
+      <button onclick="launchQuizFromWheel('${item.difficulty}')" style="background:${item.color};color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;width:100%">Start Quiz →</button>
+    </div>`;
+  }
+  const d = item.drill;
+  if (!d) return '';
+  return `
+  <div style="background:rgba(255,255,255,.03);border:1px solid #e8772244;border-radius:12px;padding:20px;text-align:left;max-width:500px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <span style="font-size:24px">🏀</span>
+      <div>
+        <span class="badge" style="background:#e8772222;color:#e87722;border:1px solid #e8772244">${d.format} · ${d.duration}min</span>
+        <h3 class="condensed" style="font-size:18px;color:#fff;margin:4px 0 0">${d.name}</h3>
+      </div>
+    </div>
+    <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin-bottom:10px">${d.description}</p>
+    <p style="color:#64748b;font-size:12px;margin-bottom:12px"><strong style="color:#e87722">Cues: </strong>${d.coachingCues.filter(Boolean).join(' · ')}</p>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      ${d.levels.map(l=>badge(l,LEVEL_COLORS[l])).join('')}
+      ${d.focus.slice(0,3).map(f=>badge(f,'#e87722')).join('')}
+    </div>
+    ${renderAwardPoints('drill-complete', d.name)}
+  </div>`;
+}
+
+function renderAwardPoints(reason, label) {
+  const pts = [50, 100, 150, 200];
+  return `
+  <div style="border-top:1px solid #1e293b;padding-top:12px">
+    <p style="color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Award Points for completing "${label}"</p>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+      ${pts.map(p=>`<button class="toggle-btn" style="background:${gState.awardPts===p?'#22c55e':'#1e293b'};font-size:12px;padding:5px 12px" onclick="setAwardPts(${p})">${p} pts</button>`).join('')}
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${state.players.length===0?`<p style="color:#334155;font-size:12px;font-style:italic">Add players to award points.</p>`:''}
+      ${state.players.map(p=>`<button class="toggle-btn" style="background:#1e293b;font-size:11px;padding:4px 10px" onclick="awardPoints('${p.id}','${p.name}','${reason}',${gState.awardPts||100})">${p.name} +${gState.awardPts||100}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function setAwardPts(p) { gState.awardPts = p; document.getElementById('game-content').innerHTML = renderGameSection(); }
+
+function setWheelFilter(f) { gState.wheelFilter = f; gState.spinResult = null; document.getElementById('game-content').innerHTML = renderGameSection(); }
+
+function spinWheel() {
+  if (gState.spinning) return;
+  const items = buildWheelItems();
+  const n = items.length;
+  const arc = 360 / n;
+  // Pick random item
+  const winIdx = Math.floor(Math.random() * n);
+  // Spin 5-8 full rotations + land on winner
+  const extraSpins = (5 + Math.floor(Math.random() * 3)) * 360;
+  // Pointer is at top (0°). Slice i starts at i*arc. To land slice winIdx under pointer:
+  const targetAngle = 360 - (winIdx * arc + arc / 2);
+  const totalAngle = gState.spinAngle + extraSpins + ((targetAngle - gState.spinAngle % 360 + 360) % 360);
+
+  gState.spinning = true;
+  gState.spinResult = null;
+  document.getElementById('game-content').innerHTML = renderGameSection();
+
+  const wheel = document.getElementById('wheel-slices');
+  if (wheel) {
+    wheel.style.transition = 'transform 3.5s cubic-bezier(0.17,0.67,0.12,0.99)';
+    wheel.style.transform = `rotate(${totalAngle}deg)`;
+  }
+
+  setTimeout(() => {
+    gState.spinning = false;
+    gState.spinAngle = totalAngle % 360;
+    gState.spinResult = items[winIdx];
+    document.getElementById('game-content').innerHTML = renderGameSection();
+  }, 3600);
+}
+
+// ── IQ Quiz ───────────────────────────────────────────────────────
+function renderQuizSection() {
+  if (gState.activeQuiz) return renderActiveQuiz();
+  const cats = ['all', ...new Set(QUIZ_BANK.map(q=>q.category))];
+  const diffs = ['all','easy','medium','hard'];
+  const filtered = QUIZ_BANK.filter(q=>
+    (gState.quizFilter==='all'||q.category===gState.quizFilter)&&
+    (gState.quizDiff==='all'||!gState.quizDiff||q.difficulty===gState.quizDiff)
+  );
+  const diffColors = {easy:'#22c55e',medium:'#f97316',hard:'#ef4444'};
+  const ptColors = {100:'#22c55e',200:'#f97316',300:'#ef4444'};
+
+  return `
+  <div>
+    <div style="margin-bottom:16px">
+      <p style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Category</p>
+      <div class="toggle-row">
+        ${cats.map(c=>`<button class="toggle-btn" style="background:${gState.quizFilter===c||(!gState.quizFilter&&c==='all')?'#e87722':'#1e293b'};font-size:11px" onclick="setQuizFilter('${c}')">${c}</button>`).join('')}
+      </div>
+    </div>
+    <div style="margin-bottom:16px">
+      <p style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Difficulty</p>
+      <div class="toggle-row">
+        ${diffs.map(d=>`<button class="toggle-btn" style="background:${(gState.quizDiff||'all')===d?(d==='all'?'#e87722':diffColors[d]||'#e87722'):'#1e293b'};font-size:11px" onclick="setQuizDiff('${d}')">${d}</button>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button onclick="launchRandomQuiz()" style="background:#e87722;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;flex:1">
+        🎲 Random Question
+      </button>
+    </div>
+    <p style="color:#475569;font-size:12px;margin-bottom:10px">${filtered.length} questions</p>
+    ${filtered.map(q=>`
+    <div onclick="launchQuiz('${q.id}')" class="card" style="cursor:pointer">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="flex:1">
+          <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+            ${badge(q.category,'#3b82f6')}
+            ${badge(q.difficulty, diffColors[q.difficulty]||'#64748b')}
+            ${badge(q.points+' pts', ptColors[q.points]||'#64748b')}
+          </div>
+          <p style="color:#e2e8f0;font-size:13px;line-height:1.5;margin:0">${q.question}</p>
+        </div>
+        <span style="color:#e87722;font-size:13px;flex-shrink:0">→</span>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderActiveQuiz() {
+  const q = gState.activeQuiz;
+  const answered = gState.quizAnswered;
+  const selected = gState.quizSelected;
+  const diffColors = {easy:'#22c55e',medium:'#f97316',hard:'#ef4444'};
+
+  return `
+  <div style="max-width:540px">
+    <button class="btn" style="background:#1e293b;padding:6px 12px;font-size:11px;margin-bottom:16px" onclick="closeQuiz()">← Back to Quiz List</button>
+    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px">
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+        ${badge(q.category,'#3b82f6')}
+        ${badge(q.difficulty,diffColors[q.difficulty]||'#64748b')}
+        ${badge(q.points+' pts for correct','#f59e0b')}
+      </div>
+      <p style="color:#fff;font-size:16px;line-height:1.6;font-weight:600;margin-bottom:18px">${q.question}</p>
+      <div style="display:grid;gap:8px;margin-bottom:16px">
+        ${q.options.map((opt,i)=>{
+          let bg = '#1e293b', border = 'rgba(255,255,255,0.08)', textColor = '#e2e8f0';
+          if (answered) {
+            if (i === q.answer) { bg='rgba(34,197,94,0.15)'; border='#22c55e'; textColor='#22c55e'; }
+            else if (i === selected) { bg='rgba(239,68,68,0.15)'; border='#ef4444'; textColor='#ef4444'; }
+          } else if (i === selected) { bg='rgba(232,119,34,0.15)'; border='#e87722'; textColor='#e87722'; }
+          return `<div onclick="${answered?'':'selectAnswer('+i+')'}" style="background:${bg};border:1px solid ${border};border-radius:8px;padding:12px 14px;cursor:${answered?'default':'pointer'};color:${textColor};font-size:13px;line-height:1.5;transition:all .15s">
+            <span style="font-weight:700;margin-right:8px">${['A','B','C','D'][i]}.</span>${opt}
+          </div>`;
+        }).join('')}
+      </div>
+      ${!answered?`<button onclick="submitAnswer()" ${selected===null||selected===undefined?'disabled':''} style="background:${selected!==null&&selected!==undefined?'#e87722':'#334155'};color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:${selected!==null&&selected!==undefined?'pointer':'not-allowed'};width:100%">Submit Answer</button>`:''}
+      ${answered?`
+      <div style="background:${selected===q.answer?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)'};border:1px solid ${selected===q.answer?'#22c55e44':'#ef444444'};border-radius:8px;padding:14px;margin-bottom:14px">
+        <p style="color:${selected===q.answer?'#22c55e':'#ef4444'};font-size:14px;font-weight:700;margin-bottom:6px">${selected===q.answer?'✓ Correct! +'+q.points+' points':'✗ Not quite'}</p>
+        <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0">${q.explanation}</p>
+      </div>
+      ${selected===q.answer?renderAwardPoints('quiz-correct',q.question.slice(0,40)+'…'):''}
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button onclick="launchRandomQuiz()" style="background:#e87722;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;flex:1">Next Question 🎲</button>
+        <button onclick="closeQuiz()" style="background:#1e293b;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">Back to List</button>
+      </div>`:''}
+    </div>
+  </div>`;
+}
+
+function setQuizFilter(f) { gState.quizFilter=f; document.getElementById('game-content').innerHTML=renderGameSection(); }
+function setQuizDiff(d) { gState.quizDiff=d; document.getElementById('game-content').innerHTML=renderGameSection(); }
+function launchQuiz(id) { gState.activeQuiz=QUIZ_BANK.find(q=>q.id===id); gState.quizAnswered=false; gState.quizSelected=null; document.getElementById('game-content').innerHTML=renderGameSection(); }
+function launchRandomQuiz() {
+  const pool = QUIZ_BANK.filter(q=>(gState.quizFilter==='all'||q.category===gState.quizFilter)&&(gState.quizDiff==='all'||!gState.quizDiff||q.difficulty===gState.quizDiff));
+  if (!pool.length) return;
+  const q = pool[Math.floor(Math.random()*pool.length)];
+  launchQuiz(q.id);
+}
+function launchQuizFromWheel(diff) { gState.gameSection='quiz'; gState.quizDiff=diff; gState.quizFilter='all'; launchRandomQuiz(); document.getElementById('game-content').innerHTML=renderGameSection(); }
+function selectAnswer(i) { gState.quizSelected=i; document.getElementById('game-content').innerHTML=renderGameSection(); }
+function submitAnswer() { gState.quizAnswered=true; document.getElementById('game-content').innerHTML=renderGameSection(); }
+function closeQuiz() { gState.activeQuiz=null; gState.quizAnswered=false; gState.quizSelected=null; document.getElementById('game-content').innerHTML=renderGameSection(); }
+
+// ── Scoreboard ────────────────────────────────────────────────────
+function renderScoreboard() {
+  const scores = gState.sessionScores;
+  const log = gState.sessionLog;
+  const sorted = state.players
+    .map(p=>({...p, pts: scores[p.id]||0}))
+    .sort((a,b)=>b.pts-a.pts);
+
+  const medalColor = i => ['#f59e0b','#94a3b8','#cd7c2f'][i]||'#334155';
+  const medalIcon = i => ['🥇','🥈','🥉'][i]||'#';
+
+  return `
+  <div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 class="condensed" style="font-size:18px;color:#fff">Session Leaderboard</h3>
+      <button class="btn" style="background:#7f1d1d;padding:6px 12px;font-size:11px" onclick="resetScores()">Reset Scores</button>
+    </div>
+
+    ${state.players.length===0?`<p style="color:#475569;font-size:13px;margin-bottom:20px">Add players in the Players tab to track scores.</p>`:
+    `<div style="margin-bottom:24px">
+      ${sorted.map((p,i)=>`
+      <div style="background:rgba(255,255,255,.03);border:1px solid ${i===0&&p.pts>0?'rgba(245,158,11,0.3)':'rgba(255,255,255,0.07)'};border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px">
+        <span style="font-size:20px;width:28px;text-align:center">${p.pts>0?medalIcon(i):'—'}</span>
+        <div style="flex:1">
+          <p style="color:#fff;font-size:15px;font-weight:700;font-family:'Barlow Condensed',sans-serif;margin:0 0 2px">${p.name}</p>
+          <div style="display:flex;gap:5px">${p.level?badge(p.level,LEVEL_COLORS[p.level]):''}</div>
+        </div>
+        <div style="text-align:right">
+          <p style="color:${p.pts>0?medalColor(i):'#334155'};font-size:22px;font-weight:800;font-family:'Barlow Condensed',sans-serif;margin:0">${p.pts}</p>
+          <p style="color:#475569;font-size:10px;margin:0">points</p>
+        </div>
+      </div>`).join('')}
+    </div>`}
+
+    <!-- Manual award -->
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:20px">
+      <p style="color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Award Points Manually</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        ${[50,100,150,200,300].map(p=>`<button class="toggle-btn" style="background:${gState.manualPts===p?'#22c55e':'#1e293b'};font-size:12px;padding:5px 12px" onclick="setManualPts(${p})">${p} pts</button>`).join('')}
+      </div>
+      <input id="award-reason" placeholder="Reason (e.g. Made 5 layups in a row)" style="margin-bottom:8px"/>
+      <div class="toggle-row">
+        ${state.players.map(p=>`<button class="toggle-btn" style="background:#1e293b;font-size:11px" onclick="manualAward('${p.id}','${p.name}')">${p.name}</button>`).join('')}
+      </div>
+    </div>
+
+    <!-- Activity log -->
+    ${log.length>0?`
+    <div>
+      <p style="color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Activity Log</p>
+      <div style="max-height:240px;overflow-y:auto">
+        ${[...log].reverse().slice(0,20).map(entry=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid #1e293b">
+          <div>
+            <span style="color:#e2e8f0;font-size:12px;font-weight:600">${entry.playerName}</span>
+            <span style="color:#475569;font-size:11px;margin-left:8px">${entry.reason}</span>
+          </div>
+          <span style="color:#22c55e;font-size:13px;font-weight:700">+${entry.points}</span>
+        </div>`).join('')}
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+function awardPoints(playerId, playerName, reason, points) {
+  gState.sessionScores[playerId] = (gState.sessionScores[playerId]||0) + points;
+  gState.sessionLog.push({ playerId, playerName, points, reason, time: new Date().toLocaleTimeString() });
+  saveGames();
+  document.getElementById('game-content').innerHTML = renderGameSection();
+}
+
+function setManualPts(p) { gState.manualPts=p; document.getElementById('game-content').innerHTML=renderGameSection(); }
+
+function manualAward(playerId, playerName) {
+  const reason = document.getElementById('award-reason')?.value || 'Manual award';
+  const pts = gState.manualPts || 100;
+  awardPoints(playerId, playerName, reason, pts);
+}
+
+function resetScores() {
+  
+  gState.sessionScores = {}; gState.sessionLog = []; saveGames();
+  document.getElementById('game-content').innerHTML = renderGameSection();
+}
+
+// ── Patch tab list to include Games ──────────────────────────────
+const _origRender = render;
+window.render = function() {
+  _origRender();
+  // Inject Games tab if not present
+  const tabBar = document.querySelector('[style*="overflow-x:auto"]');
+  if (tabBar && !document.getElementById('tab-games')) {
+    const btn = document.createElement('button');
+    btn.id = 'tab-games';
+    btn.className = 'tab-btn' + (state.tab === 'games' ? ' active' : '');
+    btn.textContent = 'Games 🎡';
+    btn.onclick = () => { state.tab = 'games'; window.render(); };
+    tabBar.appendChild(btn);
+  }
+  if (tabBar && !document.getElementById('tab-settings')) {
+    const btn2 = document.createElement('button');
+    btn2.id = 'tab-settings';
+    btn2.className = 'tab-btn' + (state.tab === 'settings' ? ' active' : '');
+    btn2.textContent = '⚙ Settings';
+    btn2.onclick = () => { state.tab = 'settings'; window.render(); };
+    tabBar.appendChild(btn2);
+  }
+  // If games tab active, replace content
+  if (state.tab === 'games') {
+    const content = document.querySelector('[style*="padding:22px 20px"]');
+    if (content) content.innerHTML = renderGames();
+  }
+  if (state.tab === 'settings') {
+    const content = document.querySelector('[style*="padding:22px 20px"]');
+    if (content) content.innerHTML = renderSettings();
+  }
+};
+
+// Initial patch render
+window.render();
+</script>
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS MODULE
+// ═══════════════════════════════════════════════════════════════════
+
+function renderSettings() {
+  const s = state.settingsSection || 'attributes';
+  const sections = [
+    ['attributes', '🏷 Skills'],
+
+  ];
+
+  return `
+  <div>
+    <div style="margin-bottom:20px">
+      <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Settings</h2>
+      <p style="color:#475569;font-size:13px">Manage picklists, player attributes, and app defaults.</p>
+    </div>
+
+    <div class="toggle-row" style="margin-bottom:24px">
+      ${sections.map(([key,label])=>`<button class="toggle-btn" style="background:${s===key?'#e87722':'#1e293b'};padding:7px 14px;font-size:12px" onclick="setSettingsSection('${key}')">${label}</button>`).join('')}
+    </div>
+
+    <div id="settings-content">
+      ${renderSettingsSection(s)}
+    </div>
+  </div>`;
+}
+
+function setSettingsSection(s) {
+  state.settingsSection = s;
+  const el = document.getElementById('settings-content');
+  if (el) el.innerHTML = renderSettingsSection(s);
+  document.querySelectorAll('.toggle-row .toggle-btn').forEach(b => {
+    if (b.textContent.includes(s)) b.style.background = '#e87722';
+  });
+}
+
+function renderSettingsSection(s) {
+  if (s === 'attributes') return renderAttributeSettings();
+
+  return '';
+}
+
+// ── Skill Settings ───────────────────────────────────────────────
+function renderAttributeSettings() {
+  const skills = SKILLS();
+  return `
+  <div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0">Skills are a single shared list used on both drills and player profiles. Tag a skill on a drill to indicate what it develops. Rate a skill on a player to indicate strength or weakness. <strong style="color:#ef4444">Weakness ratings</strong> automatically prioritise drills that share the same skill when generating a plan.</p>
+      <button class="btn" style="background:#e87722;padding:7px 14px;font-size:12px;font-weight:700;flex-shrink:0" onclick="showAddAttribute()">+ Add Skill</button>
+    </div>
+
+    <div id="attr-form" style="display:none;margin-bottom:16px"></div>
+
+    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:10px 12px;margin-bottom:14px">
+      <div style="display:flex;gap:16px;font-size:11px;flex-wrap:wrap">
+        <span style="color:#22c55e;font-weight:700">💪 S = Strength</span>
+        <span style="color:#94a3b8;font-weight:700">➖ M = Mid</span>
+        <span style="color:#ef4444;font-weight:700">⚠ W = Weakness → plan targets drills sharing this skill</span>
+      </div>
+    </div>
+
+    <div style="display:grid;gap:7px">
+      ${skills.length===0 ? `<p style="color:#334155;font-size:12px;font-style:italic">No skills defined yet.</p>` : ''}
+      ${skills.map(s => `
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="flex:1">
+          <span style="color:#fff;font-size:13px;font-weight:600">${s.label}</span>
+
+        </div>
+        <div style="display:flex;gap:5px">
+          <button class="btn" style="background:#1e293b" onclick="editAttribute('${s.id}')">Edit</button>
+          <button class="btn" style="background:#7f1d1d" onclick="deleteAttribute('${s.id}')">✕</button>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ── Generic List Settings (positions, note cats) ──────────────────
+function renderListSettings(key, title, placeholder, description) {
+  const settings = getSettings();
+  const list = settings[key] || [];
+  return `
+  <div>
+    <p style="color:#94a3b8;font-size:13px;margin-bottom:16px">${description}</p>
+    <div style="display:flex;gap:7px;margin-bottom:12px">
+      <input id="list-input-${key}" placeholder="${placeholder}" style="flex:1"/>
+      <button class="btn" style="background:#e87722;padding:7px 14px;font-size:12px;font-weight:700" onclick="addListItem('${key}')">Add</button>
+    </div>
+    <div style="display:grid;gap:6px">
+      ${list.map((item,i)=>`
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#e2e8f0;font-size:13px">${item}</span>
+        <button class="btn" style="background:#7f1d1d" onclick="removeListItem('${key}',${i})">✕</button>
+      </div>`).join('')}
+    </div>
+    ${list.length===0?`<p style="color:#334155;font-size:12px;font-style:italic;padding:8px 0">No items yet.</p>`:''}
+  </div>`;
+}
+
+function addListItem(key) {
+  const input = document.getElementById('list-input-'+key);
+  const val = input?.value?.trim();
+  if (!val) return;
+  const settings = getSettings();
+  if (!(settings[key]||[]).includes(val)) {
+    settings[key] = [...(settings[key]||[]), val];
+    state.settings = {...settings};
+    persist();
+  }
+  input.value = '';
+  const el = document.getElementById('settings-content');
+  if (el) el.innerHTML = renderSettingsSection(state.settingsSection);
+}
+
+function removeListItem(key, idx) {
+  const settings = getSettings();
+  settings[key] = (settings[key]||[]).filter((_,i)=>i!==idx);
+  state.settings = {...settings};
+  persist();
+  const el = document.getElementById('settings-content');
+  if (el) el.innerHTML = renderSettingsSection(state.settingsSection);
+}
+
+// ── Focus Area Settings ───────────────────────────────────────────
+function renderFocusSettings() {
+  const settings = getSettings();
+  const list = settings.focusOptions || [];
+  return `
+  <div>
+    <p style="color:#94a3b8;font-size:13px;margin-bottom:6px">Focus areas appear on drills and drive plan generation. They also appear in the plan builder's focus selector.</p>
+    <p style="color:#e87722;font-size:12px;margin-bottom:16px">⚠ Removing a focus area will not update existing drills — those drills just won't match until updated.</p>
+    <div style="display:flex;gap:7px;margin-bottom:12px">
+      <input id="list-input-focusOptions" placeholder="e.g. post-play, off-ball movement"/>
+      <button class="btn" style="background:#e87722;padding:7px 14px;font-size:12px;font-weight:700" onclick="addListItem('focusOptions')">Add</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:7px">
+      ${list.map((item,i)=>`
+      <div style="background:rgba(232,119,34,.1);border:1px solid rgba(232,119,34,.3);border-radius:7px;padding:6px 10px;display:flex;align-items:center;gap:7px">
+        <span style="color:#e87722;font-size:12px;font-weight:600">${item}</span>
+        <button onclick="removeListItem('focusOptions',${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;padding:0;line-height:1">✕</button>
+      </div>`).join('')}
+    </div>
+    ${list.length===0?`<p style="color:#334155;font-size:12px;font-style:italic;padding:8px 0">No focus areas defined.</p>`:''}
+    <div style="margin-top:16px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px 14px">
+      <p style="color:#475569;font-size:12px;margin:0">Tip: Focus areas must match exactly what is used on drills for the plan generator to connect them. Keep labels lowercase and consistent.</p>
+    </div>
+  </div>`;
+}
+
+// ── Skill add/edit form functions ─────────────────────────────────
+let _attrForm = {};
+function showAddAttribute() {
+  _attrForm = { id: uid('a'), label:'', focusTag:'', _new:true };
+  renderAttrForm();
+}
+function editAttribute(id) {
+  const s = SKILLS().find(x=>x.id===id);
+  if (!s) return;
+  _attrForm = {...s};
+  renderAttrForm();
+}
+function renderAttrForm() {
+  const f = _attrForm;
+  const el = document.getElementById('attr-form');
+  if (!el) return;
+  el.style.display = 'block';
+  el.innerHTML = `
+  <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:18px">
+    <h3 class="condensed" style="font-size:17px;color:#e87722;margin-bottom:14px">${f._new?'New Skill':'Edit Skill'}</h3>
+    <div class="grid2">
+      <div class="span2">
+        <div class="label">Skill Label</div>
+        <input id="af-label" value="${f.label||''}" placeholder="e.g. Court vision"/>
+      </div>
+  
+    </div>
+    <div style="display:flex;gap:7px;margin-top:14px">
+      <button class="btn" style="background:#e87722;padding:7px 18px;font-size:13px" onclick="saveAttribute()">Save</button>
+      <button class="btn" style="background:#334155;padding:7px 14px;font-size:13px" onclick="cancelAttr()">Cancel</button>
+    </div>
+  </div>`;
+}
+function saveAttribute() {
+  const label = document.getElementById('af-label')?.value?.trim();
+  if (!label) return;
+  const skill = { id: _attrForm.id||uid('s'), label };
+  const skills = SKILLS();
+  const settings = getSettings();
+  settings.skills = skills.find(s=>s.id===skill.id) ? skills.map(s=>s.id===skill.id?skill:s) : [...skills, skill];
+  state.settings = {...settings};
+  _attrForm = {};
+  persist();
+  const el = document.getElementById('settings-content');
+  if (el) el.innerHTML = renderSettingsSection('attributes');
+  const form = document.getElementById('attr-form');
+  if (form) form.style.display='none';
+}
+function cancelAttr() {
+  _attrForm = {};
+  const el = document.getElementById('attr-form');
+  if (el) el.style.display='none';
+}
+function deleteAttribute(id) {
+  const skill = SKILLS().find(s=>s.id===id);
+  const label = skill ? skill.label : id;
+  const settings = getSettings();
+  settings.skills = SKILLS().filter(s=>s.id!==id);
+  state.players = state.players.map(p=>({...p, notes:(p.notes||[]).filter(n=>n._skill!==id&&n._attr!==id)}));
+  state.teams   = state.teams.map(t=>({...t, notes:(t.notes||[]).filter(n=>n._skill!==id&&n._attr!==id)}));
+  state.settings = {...settings};
+  persist();
+  const el = document.getElementById('settings-content');
+  if (el) el.innerHTML = renderSettingsSection('attributes');
+}
+</script>
