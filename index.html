@@ -1,46 +1,56 @@
 <!DOCTYPE html>
-<html lang="en" style="background:#060d18;">
+<html lang="en" style="background:#080c14;">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CourtCraft — Smart Practice Planner</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-html,body{background:#060d18 !important;}
+:root{
+  --bg:#080c14; --bg2:#0d1420; --bg3:#111827;
+  --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.12);
+  --accent:#3b82f6; --accent2:#2563eb;
+  --text:#f1f5f9; --text2:#94a3b8; --text3:#475569; --text4:#1e2d45;
+  --success:#22c55e; --danger:#ef4444; --warning:#f59e0b;
+  --card-bg:rgba(255,255,255,0.025); --card-hover:rgba(59,130,246,0.06);
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#060d18 !important;color:#f1f5f9;font-family:'IBM Plex Sans','Segoe UI',sans-serif;min-height:100vh;}
-::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:#0f172a;}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px;}
-input,textarea,select{background:#1e293b;border:1px solid #334155;border-radius:6px;color:#f1f5f9;padding:8px 10px;font-size:13px;font-family:inherit;width:100%;outline:none;box-sizing:border-box;}
-select option{background:#1e293b;}
+html,body{background:var(--bg)!important;color:var(--text);font-family:'Inter','Segoe UI',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;font-size:18px;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:4px;}
+input,textarea,select{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:9px 12px;font-size:16px;font-family:inherit;width:100%;outline:none;box-sizing:border-box;transition:border-color .2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+select option{background:var(--bg3);}
 textarea{resize:vertical;}
 button{cursor:pointer;font-family:inherit;border:none;}
-.btn{border-radius:5px;padding:4px 10px;font-size:11px;color:#fff;transition:opacity .15s;}
-.btn:hover{opacity:.85;}
-h1,h2,h3,.condensed{font-family:'Barlow Condensed',sans-serif;letter-spacing:.03em;}
-.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
-.divider{border-top:1px solid #1e293b;margin:16px 0;}
-.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-bottom:8px;transition:border-color .2s;}
-.card:hover{border-color:rgba(232,119,34,.35);}
-.section-bar{width:3px;height:16px;background:#e87722;border-radius:2px;display:inline-block;margin-right:8px;vertical-align:middle;}
+.btn{border-radius:6px;padding:5px 12px;font-size:14px;color:#fff;transition:all .15s;font-weight:500;}
+.btn:hover{filter:brightness(1.15);}
+.brand,.condensed{font-family:'Permanent Marker',cursive;}
+.badge{display:inline-block;padding:2px 9px;border-radius:5px;font-size:13px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;}
+.divider{border-top:1px solid var(--border);margin:18px 0;}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:9px;transition:border-color .2s,background .2s;}
+.card:hover{border-color:rgba(59,130,246,.4);background:var(--card-hover);}
+.section-bar{width:3px;height:18px;background:var(--accent);border-radius:2px;display:inline-block;margin-right:8px;vertical-align:middle;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .span2{grid-column:span 2;}
-.label{display:block;color:#64748b;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;}
-.form-box{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:16px;}
-.empty-state{text-align:center;padding:48px 20px;color:#334155;}
-.empty-state .icon{font-size:40px;margin-bottom:12px;}
-.tab-btn{background:none;border:none;color:#475569;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px 13px;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
-.tab-btn.active{color:#e87722;border-bottom-color:#e87722;}
+.label{display:block;color:var(--text3);font-size:13px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
+.form-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:20px;margin-bottom:16px;}
+.empty-state{text-align:center;padding:56px 20px;color:var(--text4);}
+.empty-state .icon{font-size:51px;margin-bottom:14px;}
+.tab-btn{background:none;border:none;color:var(--text3);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:10px 14px;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-btn:hover{color:var(--text);}
 .toggle-row{display:flex;gap:6px;flex-wrap:wrap;}
-.toggle-btn{border-radius:5px;padding:5px 12px;font-size:11px;color:#fff;background:#1e293b;border:none;cursor:pointer;transition:background .15s;}
-.warn-box{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22);border-radius:8px;padding:10px 14px;margin-top:12px;}
-.plan-section{margin-bottom:18px;}
-.plan-section-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.info-bar{background:rgba(232,119,34,.06);border:1px solid rgba(232,119,34,.2);border-radius:8px;padding:8px 12px;margin-top:8px;}
+.toggle-btn{border-radius:6px;padding:5px 13px;font-size:14px;color:#fff;background:var(--bg3);border:1px solid var(--border2);cursor:pointer;transition:all .15s;font-weight:500;}
+.toggle-btn:hover{border-color:var(--accent);}
+.warn-box{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22);border-radius:10px;padding:10px 14px;margin-top:12px;}
+.plan-section{margin-bottom:20px;}
+.plan-section-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.info-bar{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:10px 14px;margin-top:8px;}
 </style>
 </head>
 <body>
 
-<div id="app" style="background:#060d18;min-height:100vh;"></div>
+<div id="app" style="background:#080c14;min-height:100vh;"></div>
 
 <script>
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -104,9 +114,120 @@ const CONCEPTS = [
   {id:"c8",category:"Decision Making",icon:"🧠",title:"Offensive Advantages",summary:"Basketball is a game of advantages. Teach players to see, create, and exploit them — not run plays.",keyIdeas:["Numerical: more attackers than defenders in an area — attack immediately","Positional: attacker in a space where the defender cannot recover in time","Momentum: attacker moving, defender static — attack before they set","Teach scanning: before the catch, what do you see?","Reduce play-calling — let players find advantages. Ask what did you see, not why didn't you run it"],teachingProgression:["3v3 name the advantage — players must identify before shooting","Constraints games that force advantage-seeking, no set plays","Post-session debrief: What was the best advantage you found today?"],saramaRef:"Transforming Basketball — Ch. 5"},
 ];
 
+const TEAM_PLAYS = [
+  {
+    id:"p1",
+    name:"Horns",
+    icon:"🔱",
+    level:"Beginner–Advanced",
+    goal:"Create ball screen actions, DHOs, and post entries from a structured, spread set. Horns is one of the most teachable sets at any level because every player has a clear role and the reads are simple.",
+    formation:"2 guards at the corners (wings), 2 bigs at the elbows (high post), 1 point guard with the ball at the top of the key.",
+    steps:[
+      "Set the formation: PG at top, two bigs on each elbow, two guards in the corners spread wide.",
+      "PG reads the defense: if a big's defender sags, enter to the elbow for a face-up opportunity.",
+      "Primary action: PG drives off a ball screen from one big. The other big shapes up as the screener's roll/pop option.",
+      "If the ball screen is denied: PG dribbles at one corner guard to initiate a DHO — the guard attacks off the handoff.",
+      "Kick-out reads: any drive collapses help, kicking to the opposite corner or the popping big.",
+      "Coaching emphasis: the formation creates a 5-out floor — no two players are close enough for one defender to guard both.",
+    ],
+    coachingCues:["Big — set the screen and read: roll if the defender goes under, pop if they fight over","PG — look for the advantage before you use the screen","Corners — stay wide and be ready to shoot immediately on the catch"],
+    progressions:["Walk through 5v0 — PG calls the action","Add 1 live defender on the ball","Full 5v5 with Horns as the set"],
+  },
+  {
+    id:"p2",
+    name:"Iverson Cut",
+    icon:"✂️",
+    level:"Beginner–Intermediate",
+    goal:"Generate a clean catch for the primary ball-handler using two sequential off-ball screens. The Iverson cut is simple to teach, creates real separation, and is nearly impossible to guard without communication.",
+    formation:"Ball-handler starts in one corner. Two screeners set at the elbows or free-throw line extended. Three remaining players spread the floor.",
+    steps:[
+      "Ball is entered to the wing or the top — ball-handler starts in the corner opposite the ball.",
+      "Ball-handler cuts hard off the first screen at the elbow (L-cut or straight cut depending on defender position).",
+      "Continues through and uses the second screen on the other side — the double screen creates a running catch across the top.",
+      "Catch the ball at the top of the key in motion — shoot, attack, or read the floor.",
+      "The two screeners immediately shape up as ball-screen options or relocate to fill.",
+      "Coaching emphasis: the timing of the cut is everything — arrive at the screen too early and the defender recovers.",
+    ],
+    coachingCues:["Cut late — set up your defender first by going away before coming","Accelerate through both screens — don't slow down","Screeners — hold the screen until the cutter clears, then relocate immediately"],
+    progressions:["2v0 walk through: cutter + one screener","Add the second screener — full 3v0","5v5 with Iverson as the primary guard action"],
+  },
+  {
+    id:"p3",
+    name:"Spain Pick-and-Roll",
+    icon:"🇪🇸",
+    level:"Intermediate–Advanced",
+    goal:"Generate an open lob or roll by adding a back-screen on the ball-screener's defender — the defender helping on the roll gets screened, leaving the roller open for a lob or short roll catch.",
+    formation:"Ball-handler at the top, screener at the elbow ready to set the ball screen, a second screener (often a big) positioned to back-screen the screener's defender, two players spread wide.",
+    steps:[
+      "Ball-handler initiates the ball screen from the top or slot.",
+      "As the ball screen is set, the second player immediately sets a back-screen on the screener's defender.",
+      "The back-screen prevents the screener's defender from hedging or dropping — their path to recover is blocked.",
+      "The screener rolls hard to the rim — they should be open for a lob or a short roll catch in the paint.",
+      "Ball-handler reads: if the back-screen works → lob to the roller. If it doesn't → continue the standard pick-and-roll read.",
+      "Coaching emphasis: timing is critical. The back-screen must be set as the ball screen is happening — not after.",
+    ],
+    coachingCues:["Back-screener — your screen is the key. Set it hard and hold it","Roller — go straight to the rim, don't drift. The lob is coming","Ball-handler — sell the drive to force the hedge, then lob over it"],
+    progressions:["3v0 walk through — PG, screener, back-screener only","Add 2 live defenders on the screen and back-screen","Full 5v5 Spain action"],
+  },
+  {
+    id:"p4",
+    name:"5-Out Motion",
+    icon:"⭕",
+    level:"Beginner–Advanced",
+    goal:"A read-based system where all five players operate above the three-point arc, using cuts, DHOs, and ball screens to create advantages. No set plays — players read the defense and react. Directly aligned with Sarama's CLA philosophy.",
+    formation:"All five players above the arc: one at the top, two at the wings, two in the corners. No post players.",
+    steps:[
+      "Default spacing: players hold their spots above the arc until a trigger appears.",
+      "Trigger 1 — drive: if a player drives, all others rotate one spot away to maintain spacing. Driver reads: finish, or kick to the open rotated player.",
+      "Trigger 2 — pass and cut: after passing, the passer reads their defender. If the defender watches the ball, cut backdoor immediately.",
+      "Trigger 3 — DHO: any player can dribble at a teammate to initiate a DHO. The receiver attacks off the handoff, the passer fills their spot.",
+      "Trigger 4 — ball screen: any player can call for a ball screen. After the screen, apply standard pick-and-roll reads.",
+      "Coaching emphasis: this is not a play — it is a system. Players must learn to read, not wait for instruction.",
+    ],
+    coachingCues:["If you pass, you have two choices: cut or screen. Never just stand.","Spacing first — if a teammate is in your area, move away","Read the defense, not the play"],
+    progressions:["5v0 — coach calls triggers as players move","5v5 with a constraint: no set plays, all reads","5v5 live — track drives, cuts, and DHOs on a whiteboard to show variety"],
+  },
+  {
+    id:"p5",
+    name:"Swing Offense (3-2 Motion)",
+    icon:"🔄",
+    level:"Beginner–Intermediate",
+    goal:"A simple ball-reversal motion offense that teaches spacing, weak-side cutting, and reading the defense. Ideal for beginners and younger teams because it has clear structure but builds habits that translate to all offenses.",
+    formation:"Point guard at the top, two wings, two corners. Ball starts on one side.",
+    steps:[
+      "Ball is entered to the wing. The point guard moves to the ball-side short corner to create the 3-2 shape.",
+      "Wing passes back to the guard who has swung to the top — ball is reversed.",
+      "As the ball swings to the top, the weak-side corner cuts hard to the ball-side corner (filling the space).",
+      "The weak-side wing reads their defender: if the defender watches the reversal, back-cut to the basket.",
+      "Ball is entered to the new ball-side wing — the action repeats on the other side.",
+      "Coaching emphasis: the swing creates defensive movement. Every reversal is a trigger — watch for the open cutter.",
+    ],
+    coachingCues:["Move when the ball moves — not after","Weak-side players: watch the ball and your defender at the same time","The reversal is the trigger — read your defender the moment the ball swings"],
+    progressions:["5v0 slow walk-through — call each position name as they move","Add 2 live defenders weak-side","Full 5v5 swing motion"],
+  },
+  {
+    id:"p6",
+    name:"Chin Action",
+    icon:"👇",
+    level:"Intermediate–Advanced",
+    goal:"A flexible action that generates a ball screen and an off-ball screen simultaneously — creating two separate advantages at once. Widely used at high school and college level as both a set play and a half-court action.",
+    formation:"Point guard at the top with the ball, big at the elbow ball-side, wing at the corner ball-side, two players weak-side spread.",
+    steps:[
+      "PG dribbles toward the ball-side elbow big — this movement signals the start of Chin.",
+      "The elbow big sets a ball screen for the PG. Simultaneously, a weak-side player sets a down screen for the weak-side wing.",
+      "PG uses the ball screen and reads: attack the rim, pull up, or find the roll man.",
+      "The off-ball screen weak-side creates a second option: if help collapses on the ball screen, the weak-side cutter coming off the down screen is open.",
+      "The screener on the off-ball action shapes up for a DHO or post entry after the cutter clears.",
+      "Coaching emphasis: the power of Chin is that both actions happen at the same time — the defense cannot cover both.",
+    ],
+    coachingCues:["PG — make a decision off the ball screen before the defense recovers","Off-ball cutter — time your cut to the screen, not the ball","If both options are covered, reset and swing — don't force it"],
+    progressions:["3v0 ball screen side only first","Add the off-ball action — 5v0 full Chin","5v5 Chin as an entry action, then play live"],
+  },
+];
+
 // ── These are now dynamic — read from settings ───────────────────────────────
-const LEVEL_COLORS={beginner:"#22c55e",intermediate:"#f97316",advanced:"#ef4444"};
-const CAT_COLORS={Transition:"#e87722",Spacing:"#3b82f6","Shot Priorities":"#f59e0b",Screens:"#8b5cf6",Cuts:"#10b981","Triggers & Actions":"#ef4444",Defense:"#64748b","Decision Making":"#06b6d4"};
+const LEVEL_COLORS={beginner:"#22c55e",intermediate:"#3b82f6",advanced:"#ef4444"};
+const CAT_COLORS={Transition:"#3b82f6",Spacing:"#3b82f6","Shot Priorities":"#f59e0b",Screens:"#8b5cf6",Cuts:"#10b981","Triggers & Actions":"#ef4444",Defense:"#64748b","Decision Making":"#06b6d4"};
 
 // Default settings — overridden by user's saved settings
 const DEFAULT_SETTINGS = {
@@ -154,7 +275,7 @@ function skillLabel(id) {
   const s = SKILLS().find(sk => sk.id === id);
   return s ? s.label : id;
 }
-function noteCatColor(c){ const cols={Strength:"#22c55e",Weakness:"#ef4444",Technical:"#3b82f6",Tactical:"#8b5cf6",Mental:"#f59e0b","Focus Area":"#e87722"}; return cols[c]||"#64748b"; }
+function noteCatColor(c){ const cols={Strength:"#22c55e",Weakness:"#ef4444",Technical:"#3b82f6",Tactical:"#8b5cf6",Mental:"#f59e0b","Focus Area":"#3b82f6"}; return cols[c]||"#64748b"; }
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let state = {
@@ -449,15 +570,15 @@ function renderPlanWizard() {
       const n = i+1;
       const active = step === n;
       const done = step > n;
-      const col = done ? '#22c55e' : active ? '#e87722' : '#334155';
+      const col = done ? '#22c55e' : active ? '#3b82f6' : '#1e2d45';
       const textCol = done ? '#22c55e' : active ? '#fff' : '#475569';
       return `
       <div style="display:flex;align-items:center;flex:1">
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
-          <div style="width:28px;height:28px;border-radius:50%;background:${done?'#22c55e':active?'#e87722':'#1e293b'};border:2px solid ${col};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${done?'#000':active?'#fff':'#475569'}">${done?'✓':n}</div>
-          <span style="font-size:10px;color:${textCol};text-align:center;letter-spacing:.03em;font-weight:${active?700:400}">${s}</span>
+          <div style="width:28px;height:28px;border-radius:50%;background:${done?'#22c55e':active?'#3b82f6':'#111827'};border:2px solid ${col};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:${done?'#000':active?'#fff':'#475569'}">${done?'✓':n}</div>
+          <span style="font-size:12px;color:${textCol};text-align:center;letter-spacing:.03em;font-weight:${active?700:400}">${s}</span>
         </div>
-        ${i < steps.length-1 ? `<div style="height:2px;flex:1;background:${step>n?'#22c55e':'#1e293b'};margin:0 4px;margin-top:-12px"></div>` : ''}
+        ${i < steps.length-1 ? `<div style="height:2px;flex:1;background:${step>n?'#22c55e':'#111827'};margin:0 4px;margin-top:-12px"></div>` : ''}
       </div>`;
     }).join('')}
   </div>`;
@@ -495,41 +616,41 @@ function renderPlanStep1(stepNav) {
 
   return `
   <div>
-    <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">New Practice Plan</h2>
-    <p style="color:#475569;font-size:13px;margin-bottom:20px">Start by choosing who this session is for — the plan will prioritise their weaknesses.</p>
+    <h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">New Practice Plan</h2>
+    <p style="color:#475569;font-size:15px;margin-bottom:20px">Start by choosing who this session is for — the plan will prioritise their weaknesses.</p>
     ${stepNav}
 
-    <div class="label" style="margin-bottom:8px">Who is this session for?</div>
+    <div class="label" style="margin-bottom:8px">What type of session is this?</div>
     <div style="display:grid;gap:8px;margin-bottom:16px">
-      ${[['team','🏆','A Team','Select a team — uses team notes and all player profiles'],['players','👤','Individual Player(s)','Select one or more players from your roster'],['general','🏀','General Group','No specific player data — balanced session']].map(([m,icon,label,desc])=>`
-      <div onclick="setState({planMode:'${m}',planPlayerIds:[],planTeamId:''})" style="background:${planMode===m?'rgba(232,119,34,0.1)':'rgba(255,255,255,0.03)'};border:2px solid ${planMode===m?'#e87722':'rgba(255,255,255,0.08)'};border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s">
-        <span style="font-size:20px">${icon}</span>
+      ${[['team','🏆','Team Practice','Select a team — full roster, team notes and player profiles'],['players','👤','Private Training','One or more individual players — personalised to their needs'],['general','🏀','Group Training','Ad-hoc group — no specific player data, balanced session']].map(([m,icon,label,desc])=>`
+      <div onclick="setState({planMode:'${m}',planPlayerIds:[],planTeamId:''})" style="background:${planMode===m?'rgba(59,130,246,0.1)':'rgba(255,255,255,0.03)'};border:2px solid ${planMode===m?'#3b82f6':'rgba(255,255,255,0.08)'};border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s">
+        <span style="font-size:23px">${icon}</span>
         <div style="flex:1">
-          <p style="color:${planMode===m?'#fff':'#cbd5e1'};font-size:14px;font-weight:700;margin:0 0 2px">${label}</p>
-          <p style="color:#475569;font-size:12px;margin:0">${desc}</p>
+          <p style="color:${planMode===m?'#fff':'#cbd5e1'};font-size:16px;font-weight:700;margin:0 0 2px">${label}</p>
+          <p style="color:#475569;font-size:14px;margin:0">${desc}</p>
         </div>
-        ${planMode===m?'<span style="color:#e87722;font-size:16px">✓</span>':''}
+        ${planMode===m?'<span style="color:#3b82f6;font-size:18px">✓</span>':''}
       </div>`).join('')}
     </div>
 
     ${planMode==='team'?`
     <div style="margin-bottom:16px">
       <div class="label">Select Team</div>
-      ${teams.length===0?`<div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;text-align:center"><p style="color:#475569;font-size:13px;margin:0">No teams yet. <span style="color:#e87722;cursor:pointer" onclick="setState({tab:'teams'})">Add a team →</span></p></div>`:`
+      ${teams.length===0?`<div style="background:#0d1420;border:1px solid #1e2d45;border-radius:8px;padding:14px;text-align:center"><p style="color:#475569;font-size:15px;margin:0">No teams yet. <span style="color:#3b82f6;cursor:pointer" onclick="setState({tab:'teams'})">Add a team →</span></p></div>`:`
       <div style="display:grid;gap:7px">
         ${teams.map(t=>{
           const tp=players.filter(p=>t.playerIds?.includes(p.id));
           const tw=(t.notes||[]).filter(n=>(n._skill&&n.rating==='weakness')||n.category==='Weakness'||n.category==='Focus Area');
           const pw=tp.reduce((a,p)=>a+(p.notes||[]).filter(n=>n.category==='Weakness'||n.category==='Focus Area').length,0);
           const sel=planTeamId===t.id;
-          return `<div onclick="setState({planTeamId:'${t.id}',planLevel:'${t.level||'intermediate'}',planPlayerCount:Math.max(${tp.length},2)})" style="background:${sel?'rgba(232,119,34,0.1)':'rgba(255,255,255,0.03)'};border:2px solid ${sel?'#e87722':'rgba(255,255,255,0.08)'};border-radius:9px;padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          return `<div onclick="setState({planTeamId:'${t.id}',planLevel:'${t.level||'intermediate'}',planPlayerCount:Math.max(${tp.length},2)})" style="background:${sel?'rgba(59,130,246,0.1)':'rgba(255,255,255,0.03)'};border:2px solid ${sel?'#3b82f6':'rgba(255,255,255,0.08)'};border-radius:9px;padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
             <div>
-              <p style="color:#fff;font-size:14px;font-weight:700;margin:0 0 4px">${t.name}</p>
+              <p style="color:#fff;font-size:16px;font-weight:700;margin:0 0 4px">${t.name}</p>
               <div style="display:flex;gap:5px">${t.ageGroup?badge(t.ageGroup,'#64748b'):''}${t.level?levelBadge(t.level):''}${badge(tp.length+' players','#475569')}</div>
             </div>
             <div style="text-align:right">
-              ${(tw.length+pw)>0?`<span style="color:#ef4444;font-size:11px;font-weight:700">${tw.length+pw} weakness note${tw.length+pw>1?'s':''}</span>`:'<span style="color:#334155;font-size:11px">no weakness notes</span>'}
-              ${sel?'<p style="color:#e87722;font-size:11px;margin:2px 0 0">Selected ✓</p>':''}
+              ${(tw.length+pw)>0?`<span style="color:#ef4444;font-size:13px;font-weight:700">${tw.length+pw} weakness note${tw.length+pw>1?'s':''}</span>`:'<span style="color:#1e2d45;font-size:13px">no weakness notes</span>'}
+              ${sel?'<p style="color:#3b82f6;font-size:13px;margin:2px 0 0">Selected ✓</p>':''}
             </div>
           </div>`;
         }).join('')}
@@ -539,20 +660,20 @@ function renderPlanStep1(stepNav) {
     ${planMode==='players'?`
     <div style="margin-bottom:16px">
       <div class="label">${planPlayerIds.length} player${planPlayerIds.length!==1?'s':''} selected</div>
-      ${players.length===0?`<div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;text-align:center"><p style="color:#475569;font-size:13px;margin:0">No players yet. <span style="color:#e87722;cursor:pointer" onclick="setState({tab:'players'})">Add players →</span></p></div>`:`
+      ${players.length===0?`<div style="background:#0d1420;border:1px solid #1e2d45;border-radius:8px;padding:14px;text-align:center"><p style="color:#475569;font-size:15px;margin:0">No players yet. <span style="color:#3b82f6;cursor:pointer" onclick="setState({tab:'players'})">Add players →</span></p></div>`:`
       <div style="display:grid;gap:6px;max-height:280px;overflow-y:auto">
         ${players.map(p=>{
           const sel=planPlayerIds.includes(p.id);
           const pw=(p.notes||[]).filter(n=>(n._skill&&n.rating==='weakness')||n.category==='Weakness'||n.category==='Focus Area');
-          return `<div onclick="togglePlanPlayer('${p.id}')" style="background:${sel?'rgba(232,119,34,0.08)':'rgba(255,255,255,0.02)'};border:2px solid ${sel?'#e87722':'rgba(255,255,255,0.06)'};border-radius:8px;padding:10px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+          return `<div onclick="togglePlanPlayer('${p.id}')" style="background:${sel?'rgba(59,130,246,0.08)':'rgba(255,255,255,0.02)'};border:2px solid ${sel?'#3b82f6':'rgba(255,255,255,0.06)'};border-radius:8px;padding:10px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
             <div style="display:flex;gap:10px;align-items:center">
-              <span style="font-size:16px">${sel?'✅':'⬜'}</span>
+              <span style="font-size:18px">${sel?'✅':'⬜'}</span>
               <div>
-                <p style="color:#e2e8f0;font-size:13px;font-weight:600;margin:0 0 3px">${p.name}</p>
+                <p style="color:#e2e8f0;font-size:15px;font-weight:600;margin:0 0 3px">${p.name}</p>
                 <div style="display:flex;gap:4px">${p.level?levelBadge(p.level):''}</div>
               </div>
             </div>
-            ${pw.length>0?`<span style="color:#ef4444;font-size:11px;font-weight:700">${pw.length} weakness note${pw.length>1?'s':''}</span>`:'<span style="color:#334155;font-size:11px">no notes</span>'}
+            ${pw.length>0?`<span style="color:#ef4444;font-size:13px;font-weight:700">${pw.length} weakness note${pw.length>1?'s':''}</span>`:'<span style="color:#1e2d45;font-size:13px">no notes</span>'}
           </div>`;
         }).join('')}
       </div>`}
@@ -560,18 +681,18 @@ function renderPlanStep1(stepNav) {
 
     ${weaknesses.length > 0 ? `
     <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px">
-      <p style="color:#ef4444;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">⚠ Weaknesses detected — plan will prioritise these</p>
+      <p style="color:#ef4444;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">⚠ Weaknesses detected — plan will prioritise these</p>
       ${weaknesses.slice(0,5).map(w=>`
       <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:5px">
-        <span style="color:#ef4444;font-size:11px;flex-shrink:0;margin-top:1px">→</span>
-        <div><span style="color:#94a3b8;font-size:12px;font-weight:600">${w.source}:</span> <span style="color:#cbd5e1;font-size:12px">${w.note.title}${w.note.content?' — '+w.note.content:''}</span></div>
+        <span style="color:#ef4444;font-size:13px;flex-shrink:0;margin-top:1px">→</span>
+        <div><span style="color:#94a3b8;font-size:14px;font-weight:600">${w.source}:</span> <span style="color:#cbd5e1;font-size:14px">${w.note.title}${w.note.content?' — '+w.note.content:''}</span></div>
       </div>`).join('')}
-      ${weaknesses.length>5?`<p style="color:#475569;font-size:11px;margin:4px 0 0">+${weaknesses.length-5} more…</p>`:''}
+      ${weaknesses.length>5?`<p style="color:#475569;font-size:13px;margin:4px 0 0">+${weaknesses.length-5} more…</p>`:''}
     </div>`:''}
 
-    ${planMode==='general'?`<div style="background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:12px 14px;margin-bottom:16px"><p style="color:#475569;font-size:12px;margin:0">No player data loaded. The plan will be balanced across all focus areas. Add players and notes to get personalised plans.</p></div>`:''}
+    ${planMode==='general'?`<div style="background:#0d1420;border:1px solid #111827;border-radius:10px;padding:12px 14px;margin-bottom:16px"><p style="color:#475569;font-size:14px;margin:0">No player data loaded. The plan will be balanced across all focus areas. Add players and notes to get personalised plans.</p></div>`:''}
 
-    <button onclick="${canProceed?`setState({planStep:2})`:'null'}" ${canProceed?'':'disabled'} style="background:${canProceed?'#e87722':'#334155'};color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:${canProceed?'pointer':'not-allowed'};width:100%">
+    <button onclick="${canProceed?`setState({planStep:2})`:'null'}" ${canProceed?'':'disabled'} style="background:${canProceed?'#3b82f6':'#1e2d45'};color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:16px;font-weight:700;font-family:'Permanent Marker',cursive;letter-spacing:.06em;text-transform:uppercase;cursor:${canProceed?'pointer':'not-allowed'};width:100%">
       Next: Session Details →
     </button>
   </div>`;
@@ -589,21 +710,21 @@ function renderPlanStep2(stepNav) {
   ];
   return `
   <div>
-    <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Session Details</h2>
-    <p style="color:#475569;font-size:13px;margin-bottom:20px">Set the parameters for this session.</p>
+    <h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">Session Details</h2>
+    <p style="color:#475569;font-size:15px;margin-bottom:20px">Set the parameters for this session.</p>
     ${stepNav}
 
     <div style="margin-bottom:16px">
       <div class="label">Session Type</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px">
         ${sessionTypes.map(st => `
-        <div onclick="setState({planSessionType:'${st.id}'})" style="background:${(planSessionType||'full')===st.id?'rgba(232,119,34,0.12)':'rgba(255,255,255,0.02)'};border:2px solid ${(planSessionType||'full')===st.id?'#e87722':'rgba(255,255,255,0.07)'};border-radius:9px;padding:10px 13px;cursor:pointer;transition:all .15s">
+        <div onclick="setState({planSessionType:'${st.id}'})" style="background:${(planSessionType||'full')===st.id?'rgba(59,130,246,0.12)':'rgba(255,255,255,0.02)'};border:2px solid ${(planSessionType||'full')===st.id?'#3b82f6':'rgba(255,255,255,0.07)'};border-radius:9px;padding:10px 13px;cursor:pointer;transition:all .15s">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
-            <span style="font-size:16px">${st.icon}</span>
-            <span style="color:${(planSessionType||'full')===st.id?'#fff':'#cbd5e1'};font-size:13px;font-weight:700;font-family:'Barlow Condensed',sans-serif">${st.label}</span>
-            ${(planSessionType||'full')===st.id?'<span style="color:#e87722;font-size:11px;margin-left:auto">✓</span>':''}
+            <span style="font-size:18px">${st.icon}</span>
+            <span style="color:${(planSessionType||'full')===st.id?'#fff':'#cbd5e1'};font-size:15px;font-weight:700;font-family:'Permanent Marker',cursive">${st.label}</span>
+            ${(planSessionType||'full')===st.id?'<span style="color:#3b82f6;font-size:13px;margin-left:auto">✓</span>':''}
           </div>
-          <p style="color:#475569;font-size:11px;margin:0;line-height:1.4">${st.desc}</p>
+          <p style="color:#475569;font-size:13px;margin:0;line-height:1.4">${st.desc}</p>
         </div>`).join('')}
       </div>
     </div>
@@ -619,14 +740,14 @@ function renderPlanStep2(stepNav) {
       <div><div class="label">Players Available</div><input type="number" value="${planPlayerCount}" min="2" max="25" onchange="setState({planPlayerCount:+this.value})"/></div>
     </div>
     <div style="margin-top:14px">
-      <div class="label">Additional Skills to target <span style="color:#334155;font-weight:400;text-transform:none;font-size:11px">(optional — player weakness skills already included)</span></div>
+      <div class="label">Additional Skills to target <span style="color:#1e2d45;font-weight:400;text-transform:none;font-size:13px">(optional — player weakness skills already included)</span></div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
-        ${SKILLS().map(s=>`<button data-plan-skill="${s.id}" onclick="togglePlanFocus('${s.id}')" style="background:${planFocus.includes(s.id)?'#e87722':'#1e293b'};border:1px solid ${planFocus.includes(s.id)?'#e87722':'#334155'};border-radius:6px;padding:5px 12px;font-size:12px;color:${planFocus.includes(s.id)?'#fff':'#64748b'};cursor:pointer;font-family:inherit;font-weight:${planFocus.includes(s.id)?700:400};transition:all .15s">${s.label}</button>`).join('')}
+        ${SKILLS().map(s=>`<button data-plan-skill="${s.id}" onclick="togglePlanFocus('${s.id}')" style="background:${planFocus.includes(s.id)?'#3b82f6':'#111827'};border:1px solid ${planFocus.includes(s.id)?'#3b82f6':'#1e2d45'};border-radius:6px;padding:5px 12px;font-size:14px;color:${planFocus.includes(s.id)?'#fff':'#64748b'};cursor:pointer;font-family:inherit;font-weight:${planFocus.includes(s.id)?700:400};transition:all .15s">${s.label}</button>`).join('')}
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:20px">
-      <button onclick="setState({planStep:1})" style="background:#1e293b;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">← Back</button>
-      <button onclick="setState({planStep:3})" style="background:#e87722;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex:1">Next: Review →</button>
+      <button onclick="setState({planStep:1})" style="background:#111827;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer">← Back</button>
+      <button onclick="setState({planStep:3})" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:16px;font-weight:700;font-family:'Permanent Marker',cursive;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex:1">Next: Review →</button>
     </div>
   </div>`;
 }
@@ -640,52 +761,52 @@ function renderPlanStep3(stepNav) {
 
   return `
   <div>
-    <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Review & Generate</h2>
-    <p style="color:#475569;font-size:13px;margin-bottom:20px">Confirm the plan before generating.</p>
+    <h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">Review & Generate</h2>
+    <p style="color:#475569;font-size:15px;margin-bottom:20px">Confirm the plan before generating.</p>
     ${stepNav}
 
-    <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:18px;margin-bottom:16px">
+    <div style="background:#0d1420;border:1px solid #1e2d45;border-radius:12px;padding:18px;margin-bottom:16px">
       <div style="display:grid;gap:10px">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #1e293b">
-          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">For</span>
-          <span style="color:#fff;font-size:13px;font-weight:600">${contextLabel}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #111827">
+          <span style="color:#64748b;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">For</span>
+          <span style="color:#fff;font-size:15px;font-weight:600">${contextLabel}</span>
         </div>
         ${planMode==='team'&&selectedTeam?`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #1e293b">
-          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Roster</span>
-          <span style="color:#94a3b8;font-size:12px">${players.filter(p=>selectedTeam.playerIds?.includes(p.id)).map(p=>p.name).join(', ')||'—'}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #111827">
+          <span style="color:#64748b;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Roster</span>
+          <span style="color:#94a3b8;font-size:14px">${players.filter(p=>selectedTeam.playerIds?.includes(p.id)).map(p=>p.name).join(', ')||'—'}</span>
         </div>`:''}
         ${planMode==='players'&&selectedPlayers.length>0?`
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:10px;border-bottom:1px solid #1e293b">
-          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Players</span>
-          <span style="color:#94a3b8;font-size:12px;text-align:right">${selectedPlayers.map(p=>p.name).join(', ')}</span>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:10px;border-bottom:1px solid #111827">
+          <span style="color:#64748b;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Players</span>
+          <span style="color:#94a3b8;font-size:14px;text-align:right">${selectedPlayers.map(p=>p.name).join(', ')}</span>
         </div>`:''}
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #1e293b">
-          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Session Type</span>
-          <span style="color:#e87722;font-size:12px;font-weight:700">${(['full','game','skills','speed','strength','athleticism'].includes(planSessionType)?{'full':'🏀 Full Session','game':'🆚 Game-Based','skills':'⚙️ Skills Focus','speed':'⚡ Speed & Agility','strength':'💪 Strength','athleticism':'🦾 Athleticism'}[planSessionType]:'🏀 Full Session')}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #111827">
+          <span style="color:#64748b;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Session Type</span>
+          <span style="color:#3b82f6;font-size:14px;font-weight:700">${(['full','game','skills','speed','strength','athleticism'].includes(planSessionType)?{'full':'🏀 Full Session','game':'🆚 Game-Based','skills':'⚙️ Skills Focus','speed':'⚡ Speed & Agility','strength':'💪 Strength','athleticism':'🦾 Athleticism'}[planSessionType]:'🏀 Full Session')}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #1e293b">
-          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Session</span>
-          <span style="color:#94a3b8;font-size:12px">Age ${planAge} · ${planLevel} · ${planDuration} min · ${planPlayerCount} players</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #111827">
+          <span style="color:#64748b;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Session</span>
+          <span style="color:#94a3b8;font-size:14px">Age ${planAge} · ${planLevel} · ${planDuration} min · ${planPlayerCount} players</span>
         </div>
         ${rawWeaknesses.length>0?`
-        <div style="padding-bottom:10px;border-bottom:1px solid #1e293b">
-          <span style="color:#ef4444;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Weaknesses to address</span>
-          ${rawWeaknesses.slice(0,4).map(w=>`<p style="color:#cbd5e1;font-size:12px;margin:3px 0"><span style="color:#94a3b8">${w.source}:</span> ${w.title}</p>`).join('')}
+        <div style="padding-bottom:10px;border-bottom:1px solid #111827">
+          <span style="color:#ef4444;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Weaknesses to address</span>
+          ${rawWeaknesses.slice(0,4).map(w=>`<p style="color:#cbd5e1;font-size:14px;margin:3px 0"><span style="color:#94a3b8">${w.source}:</span> ${w.title}</p>`).join('')}
         </div>`:''}
         <div>
-          <span style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Drill focus will target</span>
+          <span style="color:#64748b;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Drill focus will target</span>
           <div style="display:flex;gap:5px;flex-wrap:wrap">
-            ${allFocus.length>0?allFocus.map(id=>badge(skillLabel(id),'#e87722')).join(''):badge('balanced','#64748b')}
-            ${rawWeaknesses.length>0?'<span style="color:#ef4444;font-size:11px;align-self:center;margin-left:4px">← from player weaknesses</span>':''}
+            ${allFocus.length>0?allFocus.map(id=>badge(skillLabel(id),'#3b82f6')).join(''):badge('balanced','#64748b')}
+            ${rawWeaknesses.length>0?'<span style="color:#ef4444;font-size:13px;align-self:center;margin-left:4px">← from player weaknesses</span>':''}
           </div>
         </div>
       </div>
     </div>
 
     <div style="display:flex;gap:8px">
-      <button onclick="setState({planStep:2})" style="background:#1e293b;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">← Back</button>
-      <button onclick="buildPlan()" style="background:#e87722;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:15px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex:1">Generate Plan →</button>
+      <button onclick="setState({planStep:2})" style="background:#111827;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer">← Back</button>
+      <button onclick="buildPlan()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:17px;font-weight:700;font-family:'Permanent Marker',cursive;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;flex:1">Generate Plan →</button>
     </div>
   </div>`;
 }
@@ -694,41 +815,41 @@ function renderPlanOutput() {
   const plan = state.generatedPlan;
   if (!plan) return '';
   return `
-  <div style="background:#080f1a;border:1px solid #e87722;border-radius:14px;padding:24px">
+  <div style="background:#080f1a;border:1px solid #3b82f6;border-radius:14px;padding:24px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:8px">
       <div>
-        <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">${plan.title}</h2>
-        <p style="color:#64748b;font-size:13px;margin:0">${plan.subtitle}</p>
-        ${plan.contextLabel&&plan.contextLabel!=='General Group'?`<p style="color:#e87722;font-size:12px;margin:4px 0 0">For: ${plan.contextLabel}</p>`:''}
+        <h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">${plan.title}</h2>
+        <p style="color:#64748b;font-size:15px;margin:0">${plan.subtitle}</p>
+        ${plan.contextLabel&&plan.contextLabel!=='General Group'?`<p style="color:#3b82f6;font-size:14px;margin:4px 0 0">For: ${plan.contextLabel}</p>`:''}
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn" style="background:#1e293b;padding:6px 12px;font-size:11px" onclick="copyPlan()">Copy Plan</button>
-        ${!state.planSaved?`<button class="btn" style="background:#22c55e;padding:6px 12px;font-size:11px" onclick="saveSession()">💾 Save to History</button>`:`<span style="color:#22c55e;font-size:11px;padding:6px 4px">✓ Saved</span>`}
-        <button class="btn" style="background:#334155;padding:6px 12px;font-size:11px" onclick="setState({generatedPlan:null,planSaved:false,planStep:1})">New Plan</button>
+        <button class="btn" style="background:#111827;padding:6px 12px;font-size:13px" onclick="copyPlan()">Copy Plan</button>
+        ${!state.planSaved?`<button class="btn" style="background:#22c55e;padding:6px 12px;font-size:13px" onclick="saveSession()">💾 Save to History</button>`:`<span style="color:#22c55e;font-size:13px;padding:6px 4px">✓ Saved</span>`}
+        <button class="btn" style="background:#1e2d45;padding:6px 12px;font-size:13px" onclick="setState({generatedPlan:null,planSaved:false,planStep:1})">New Plan</button>
       </div>
     </div>
     ${plan.weaknessSummary&&plan.weaknessSummary.length?`
     <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px 14px;margin-bottom:14px">
-      <p style="color:#ef4444;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Weaknesses being addressed this session</p>
-      ${plan.weaknessSummary.map(w=>`<p style="color:#fca5a5;font-size:12px;margin:3px 0">→ ${w}</p>`).join('')}
+      <p style="color:#ef4444;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Weaknesses being addressed this session</p>
+      ${plan.weaknessSummary.map(w=>`<p style="color:#fca5a5;font-size:14px;margin:3px 0">→ ${w}</p>`).join('')}
       <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(239,68,68,0.15);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="color:#818cf8;font-size:11px;font-weight:700;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:4px;padding:2px 8px">matched</span>
-        <span style="color:#64748b;font-size:11px">= drill was specifically chosen to address a weakness</span>
-        <span style="color:#a5b4fc;font-size:11px">· purple focus tags = matched areas</span>
+        <span style="color:#818cf8;font-size:13px;font-weight:700;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:4px;padding:2px 8px">matched</span>
+        <span style="color:#64748b;font-size:13px">= drill was specifically chosen to address a weakness</span>
+        <span style="color:#a5b4fc;font-size:13px">· purple focus tags = matched areas</span>
       </div>
     </div>`:''}
-    ${plan.warnings&&plan.warnings.length?`<div class="warn-box" style="margin-bottom:16px"><p style="color:#ef4444;font-size:12px;font-weight:700;margin-bottom:4px">Drills excluded (player count):</p>${plan.warnings.map(w=>`<p style="color:#fca5a5;font-size:11px;margin:2px 0">• ${w}</p>`).join('')}</div>`:''}
+    ${plan.warnings&&plan.warnings.length?`<div class="warn-box" style="margin-bottom:16px"><p style="color:#ef4444;font-size:14px;font-weight:700;margin-bottom:4px">Drills excluded (player count):</p>${plan.warnings.map(w=>`<p style="color:#fca5a5;font-size:13px;margin:2px 0">• ${w}</p>`).join('')}</div>`:''}
     ${plan.sections.map(s=>`
     <div class="plan-section">
       <div class="plan-section-head">
         <span class="section-bar"></span>
-        <span class="condensed" style="font-size:15px;font-weight:700;color:#e87722;letter-spacing:.04em;text-transform:uppercase">${s.title}</span>
-        <span style="color:#475569;font-size:12px">${s.duration} min</span>
+        <span class="condensed" style="font-size:17px;font-weight:700;color:#3b82f6;letter-spacing:.04em;text-transform:uppercase">${s.title}</span>
+        <span style="color:#475569;font-size:14px">${s.duration} min</span>
       </div>
-      ${s.drills.length?s.drills.map(d=>renderDrillCard(d,{compact:true,playerCount:state.planPlayerCount,matchedTags:state.generatedPlan&&state.generatedPlan.skillIds?state.generatedPlan.skillIds:[]})).join(''):`<p style="color:#334155;font-size:12px;font-style:italic;padding-left:12px">No matching drills — consider adding more to your library.</p>`}
-      ${s.notes?`<p style="color:#64748b;font-size:12px;font-style:italic;margin:4px 0 0 12px">${s.notes}</p>`:''}
+      ${s.drills.length?s.drills.map(d=>renderDrillCard(d,{compact:true,playerCount:state.planPlayerCount,matchedTags:state.generatedPlan&&state.generatedPlan.skillIds?state.generatedPlan.skillIds:[]})).join(''):`<p style="color:#1e2d45;font-size:14px;font-style:italic;padding-left:12px">No matching drills — consider adding more to your library.</p>`}
+      ${s.notes?`<p style="color:#64748b;font-size:14px;font-style:italic;margin:4px 0 0 12px">${s.notes}</p>`:''}
     </div>`).join('')}
-    ${plan.coachNotes?`<div class="divider"></div><p style="color:#64748b;font-size:12px"><strong style="color:#94a3b8">Coach Notes: </strong>${plan.coachNotes}</p>`:''}
+    ${plan.coachNotes?`<div class="divider"></div><p style="color:#64748b;font-size:14px"><strong style="color:#94a3b8">Coach Notes: </strong>${plan.coachNotes}</p>`:''}
   </div>`;
 }
 
@@ -740,9 +861,9 @@ function renderPlayers() {
     const f = playerForm||{};
     return `
     <div>
-      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({playerView:${selectedPlayer?`'detail'`:`'list'`},playerForm:null})">← Back</button>
+      <button class="btn" style="background:#111827;padding:7px 14px;font-size:14px;margin-bottom:20px" onclick="setState({playerView:${selectedPlayer?`'detail'`:`'list'`},playerForm:null})">← Back</button>
       <div class="form-box">
-        <h3 class="condensed" style="font-size:18px;color:#e87722;margin-bottom:16px">${f._edit?'Edit Player':'New Player'}</h3>
+        <h3 class="condensed" style="font-size:21px;color:#3b82f6;margin-bottom:16px">${f._edit?'Edit Player':'New Player'}</h3>
         <div class="grid2">
           <div class="span2"><div class="label">Full Name</div><input id="pf-name" value="${f.name||''}" placeholder="Player name"/></div>
           <div><div class="label">Age</div><input id="pf-age" type="number" value="${f.age||''}" min="6" max="25"/></div>
@@ -754,8 +875,8 @@ function renderPlayers() {
 
         </div>
         <div style="display:flex;gap:8px;margin-top:16px">
-          <button class="btn" style="background:#e87722;padding:8px 20px;font-size:13px" onclick="savePlayer()">Save Player</button>
-          <button class="btn" style="background:#334155;padding:8px 16px;font-size:13px" onclick="setState({playerView:${selectedPlayer?`'detail'`:`'list'`},playerForm:null})">Cancel</button>
+          <button class="btn" style="background:#3b82f6;padding:8px 20px;font-size:15px" onclick="savePlayer()">Save Player</button>
+          <button class="btn" style="background:#1e2d45;padding:8px 16px;font-size:15px" onclick="setState({playerView:${selectedPlayer?`'detail'`:`'list'`},playerForm:null})">Cancel</button>
         </div>
       </div>
     </div>`;
@@ -766,13 +887,13 @@ function renderPlayers() {
     const ps = sessions.filter(s=>s.playerIds&&s.playerIds.includes(p.id));
     return `
     <div>
-      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({playerView:'list',selectedPlayer:null})">← All Players</button>
+      <button class="btn" style="background:#111827;padding:7px 14px;font-size:14px;margin-bottom:20px" onclick="setState({playerView:'list',selectedPlayer:null})">← All Players</button>
       <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px;margin-bottom:18px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
           <div style="display:flex;align-items:center;gap:12px">
-            <div style="width:42px;height:42px;border-radius:50%;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:18px">🏀</div>
+            <div style="width:42px;height:42px;border-radius:50%;background:#111827;display:flex;align-items:center;justify-content:center;font-size:21px">🏀</div>
             <div>
-              <h2 class="condensed" style="font-size:24px;color:#fff;margin-bottom:6px">${p.name}</h2>
+              <h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:6px">${p.name}</h2>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
                 ${p.age?badge('Age '+p.age,'#64748b'):''}
                 ${p.level?levelBadge(p.level):''}
@@ -781,18 +902,18 @@ function renderPlayers() {
             </div>
           </div>
           <div style="display:flex;gap:6px">
-            ${btn('Edit','#334155',`editPlayer('${p.id}')`)}
+            ${btn('Edit','#1e2d45',`editPlayer('${p.id}')`)}
             ${btn('Delete','#7f1d1d',`deletePlayer('${p.id}')`)}
           </div>
         </div>
       </div>
       <div style="margin-bottom:18px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#e87722"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#e87722;letter-spacing:.04em;text-transform:uppercase">Coaching Notes</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#3b82f6"></span><span class="condensed" style="font-size:16px;font-weight:700;color:#3b82f6;letter-spacing:.04em;text-transform:uppercase">Coaching Notes</span></div>
         ${renderNotesList(p.notes||[], p.id, 'player')}
       </div>
       <div class="divider"></div>
       <div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#3b82f6"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#3b82f6;letter-spacing:.04em;text-transform:uppercase">Session History</span>${badge(ps.length+' sessions','#3b82f6')}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#3b82f6"></span><span class="condensed" style="font-size:16px;font-weight:700;color:#3b82f6;letter-spacing:.04em;text-transform:uppercase">Session History</span>${badge(ps.length+' sessions','#3b82f6')}</div>
         ${renderSessionHistory(ps)}
       </div>
     </div>`;
@@ -801,20 +922,20 @@ function renderPlayers() {
   return `
   <div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div><h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Players</h2><p style="color:#475569;font-size:13px">Manage player profiles, coaching notes, and session history.</p></div>
-      <button class="btn" style="background:#e87722;padding:8px 16px;font-size:13px;font-weight:700" onclick="newPlayer()">+ Add Player</button>
+      <div><h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">Players</h2><p style="color:#475569;font-size:15px">Manage player profiles, coaching notes, and session history.</p></div>
+      <button class="btn" style="background:#3b82f6;padding:8px 16px;font-size:15px;font-weight:700" onclick="newPlayer()">+ Add Player</button>
     </div>
     ${players.length===0?`<div class="empty-state"><div class="icon">👤</div><p>No players yet. Add your first player.</p></div>`:''}
     ${players.map(p=>`
     <div class="card" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="openPlayer('${p.id}')">
       <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:36px;height:36px;border-radius:50%;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:15px">🏀</div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#111827;display:flex;align-items:center;justify-content:center;font-size:17px">🏀</div>
         <div>
-          <p class="condensed" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px">${p.name}</p>
+          <p class="condensed" style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px">${p.name}</p>
           <div style="display:flex;gap:5px;flex-wrap:wrap">${p.age?badge('Age '+p.age,'#64748b'):''}${p.level?levelBadge(p.level):''}</div>
         </div>
       </div>
-      <div style="text-align:right"><p style="color:#475569;font-size:11px;margin:0">${(p.notes||[]).length} notes</p><p style="color:#334155;font-size:11px;margin:2px 0 0">${sessions.filter(s=>s.playerIds?.includes(p.id)).length} sessions</p></div>
+      <div style="text-align:right"><p style="color:#475569;font-size:13px;margin:0">${(p.notes||[]).length} notes</p><p style="color:#1e2d45;font-size:13px;margin:2px 0 0">${sessions.filter(s=>s.playerIds?.includes(p.id)).length} sessions</p></div>
     </div>`).join('')}
   </div>`;
 }
@@ -827,9 +948,9 @@ function renderTeams() {
     const f = teamForm||{};
     return `
     <div>
-      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({teamView:${selectedTeam?`'detail'`:`'list'`},teamForm:null,pickingPlayers:false})">← Back</button>
+      <button class="btn" style="background:#111827;padding:7px 14px;font-size:14px;margin-bottom:20px" onclick="setState({teamView:${selectedTeam?`'detail'`:`'list'`},teamForm:null,pickingPlayers:false})">← Back</button>
       <div class="form-box">
-        <h3 class="condensed" style="font-size:18px;color:#e87722;margin-bottom:16px">${f._edit?'Edit Team':'New Team'}</h3>
+        <h3 class="condensed" style="font-size:21px;color:#3b82f6;margin-bottom:16px">${f._edit?'Edit Team':'New Team'}</h3>
         <div class="grid2">
           <div class="span2"><div class="label">Team Name</div><input id="tf-name" value="${f.name||''}" placeholder="e.g. U14 Warriors"/></div>
           <div><div class="label">Age Group</div><input id="tf-age" value="${f.ageGroup||''}" placeholder="e.g. U14"/></div>
@@ -842,25 +963,25 @@ function renderTeams() {
         <div style="margin-top:14px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <div class="label" style="margin:0">Players (${(f.playerIds||[]).length} selected)</div>
-            <button class="btn" style="background:${pickingPlayers?'#e87722':'#1e293b'}" onclick="setState({pickingPlayers:!state.pickingPlayers})">${pickingPlayers?'Done':'Select Players'}</button>
+            <button class="btn" style="background:${pickingPlayers?'#3b82f6':'#111827'}" onclick="setState({pickingPlayers:!state.pickingPlayers})">${pickingPlayers?'Done':'Select Players'}</button>
           </div>
           ${pickingPlayers?`
           <div style="display:grid;gap:5px;max-height:180px;overflow-y:auto">
-            ${players.length===0?`<p style="color:#475569;font-size:12px">No players yet.</p>`:''}
+            ${players.length===0?`<p style="color:#475569;font-size:14px">No players yet.</p>`:''}
             ${players.map(p=>{const sel=(f.playerIds||[]).includes(p.id);return`
-            <div onclick="toggleTeamPlayer('${p.id}')" style="background:${sel?'rgba(232,119,34,0.1)':'rgba(255,255,255,0.02)'};border:1px solid ${sel?'#e8772255':'rgba(255,255,255,0.06)'};border-radius:7px;padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
-              <div style="display:flex;gap:8px;align-items:center"><span>${sel?'✅':'⬜'}</span><span style="color:#e2e8f0;font-size:13px">${p.name}</span></div>
+            <div onclick="toggleTeamPlayer('${p.id}')" style="background:${sel?'rgba(59,130,246,0.1)':'rgba(255,255,255,0.02)'};border:1px solid ${sel?'#3b82f655':'rgba(255,255,255,0.06)'};border-radius:7px;padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+              <div style="display:flex;gap:8px;align-items:center"><span>${sel?'✅':'⬜'}</span><span style="color:#e2e8f0;font-size:15px">${p.name}</span></div>
               <div style="display:flex;gap:4px">${p.level?levelBadge(p.level):''}</div>
             </div>`;}).join('')}
           </div>`:`
           <div style="display:flex;flex-wrap:wrap;gap:6px">
-            ${(f.playerIds||[]).length===0?`<p style="color:#334155;font-size:12px;font-style:italic">No players selected yet.</p>`:''}
-            ${(f.playerIds||[]).map(pid=>{const pl=players.find(x=>x.id===pid);return pl?badge(pl.name,'#e87722'):''}).join('')}
+            ${(f.playerIds||[]).length===0?`<p style="color:#1e2d45;font-size:14px;font-style:italic">No players selected yet.</p>`:''}
+            ${(f.playerIds||[]).map(pid=>{const pl=players.find(x=>x.id===pid);return pl?badge(pl.name,'#3b82f6'):''}).join('')}
           </div>`}
         </div>
         <div style="display:flex;gap:8px;margin-top:16px">
-          <button class="btn" style="background:#e87722;padding:8px 20px;font-size:13px" onclick="saveTeam()">Save Team</button>
-          <button class="btn" style="background:#334155;padding:8px 16px;font-size:13px" onclick="setState({teamView:${selectedTeam?`'detail'`:`'list'`},teamForm:null,pickingPlayers:false})">Cancel</button>
+          <button class="btn" style="background:#3b82f6;padding:8px 20px;font-size:15px" onclick="saveTeam()">Save Team</button>
+          <button class="btn" style="background:#1e2d45;padding:8px 16px;font-size:15px" onclick="setState({teamView:${selectedTeam?`'detail'`:`'list'`},teamForm:null,pickingPlayers:false})">Cancel</button>
         </div>
       </div>
     </div>`;
@@ -872,32 +993,32 @@ function renderTeams() {
     const ts = sessions.filter(s=>s.teamId===t.id);
     return `
     <div>
-      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({teamView:'list',selectedTeam:null})">← All Teams</button>
+      <button class="btn" style="background:#111827;padding:7px 14px;font-size:14px;margin-bottom:20px" onclick="setState({teamView:'list',selectedTeam:null})">← All Teams</button>
       <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px;margin-bottom:18px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
           <div>
-            <h2 class="condensed" style="font-size:24px;color:#fff;margin-bottom:8px">${t.name}</h2>
+            <h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:8px">${t.name}</h2>
             <div style="display:flex;gap:6px;flex-wrap:wrap">${t.ageGroup?badge(t.ageGroup,'#64748b'):''}${t.level?levelBadge(t.level):''}${badge(tp.length+' players','#475569')}</div>
           </div>
           <div style="display:flex;gap:6px">
-            ${btn('Edit','#334155',`editTeam('${t.id}')`)}
+            ${btn('Edit','#1e2d45',`editTeam('${t.id}')`)}
             ${btn('Delete','#7f1d1d',`deleteTeam('${t.id}')`)}
           </div>
         </div>
       </div>
       ${tp.length>0?`
       <div style="margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="section-bar" style="background:#f97316"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:.04em">Roster</span></div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px">${tp.map(p=>`<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:6px 10px;display:flex;gap:7px;align-items:center"><span style="color:#e2e8f0;font-size:13px;font-weight:600">${p.name}</span></div>`).join('')}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="section-bar" style="background:#f97316"></span><span class="condensed" style="font-size:16px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:.04em">Roster</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">${tp.map(p=>`<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:6px 10px;display:flex;gap:7px;align-items:center"><span style="color:#e2e8f0;font-size:15px;font-weight:600">${p.name}</span></div>`).join('')}</div>
       </div>`:''}
       <div class="divider"></div>
       <div style="margin-bottom:18px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#e87722"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#e87722;text-transform:uppercase;letter-spacing:.04em">Team Notes</span></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#3b82f6"></span><span class="condensed" style="font-size:16px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.04em">Team Notes</span></div>
         ${renderNotesList(t.notes||[], t.id, 'team')}
       </div>
       <div class="divider"></div>
       <div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#3b82f6"></span><span class="condensed" style="font-size:14px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.04em">Session History</span>${badge(ts.length+' sessions','#3b82f6')}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="section-bar" style="background:#3b82f6"></span><span class="condensed" style="font-size:16px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.04em">Session History</span>${badge(ts.length+' sessions','#3b82f6')}</div>
         ${renderSessionHistory(ts)}
       </div>
     </div>`;
@@ -906,17 +1027,17 @@ function renderTeams() {
   return `
   <div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div><h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Teams</h2><p style="color:#475569;font-size:13px">Manage teams, rosters, team notes, and session history.</p></div>
-      <button class="btn" style="background:#e87722;padding:8px 16px;font-size:13px;font-weight:700" onclick="newTeam()">+ Add Team</button>
+      <div><h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">Teams</h2><p style="color:#475569;font-size:15px">Manage teams, rosters, team notes, and session history.</p></div>
+      <button class="btn" style="background:#3b82f6;padding:8px 16px;font-size:15px;font-weight:700" onclick="newTeam()">+ Add Team</button>
     </div>
     ${teams.length===0?`<div class="empty-state"><div class="icon">🏆</div><p>No teams yet. Add your first team.</p></div>`:''}
     ${teams.map(t=>{const tp=players.filter(p=>t.playerIds?.includes(p.id));const ts=sessions.filter(s=>s.teamId===t.id);return`
     <div class="card" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="openTeam('${t.id}')">
       <div>
-        <p class="condensed" style="font-size:16px;font-weight:700;color:#fff;margin-bottom:5px">${t.name}</p>
+        <p class="condensed" style="font-size:18px;font-weight:700;color:#fff;margin-bottom:5px">${t.name}</p>
         <div style="display:flex;gap:5px;flex-wrap:wrap">${t.ageGroup?badge(t.ageGroup,'#64748b'):''}${t.level?levelBadge(t.level):''}${badge(tp.length+' players','#475569')}</div>
       </div>
-      <div style="text-align:right"><p style="color:#475569;font-size:11px;margin:0">${(t.notes||[]).length} notes</p><p style="color:#334155;font-size:11px;margin:2px 0 0">${ts.length} sessions</p></div>
+      <div style="text-align:right"><p style="color:#475569;font-size:13px;margin:0">${(t.notes||[]).length} notes</p><p style="color:#1e2d45;font-size:13px;margin:2px 0 0">${ts.length} sessions</p></div>
     </div>`;}).join('')}
   </div>`;
 }
@@ -928,26 +1049,35 @@ function renderLibrary() {
     (!libSearch||d.name.toLowerCase().includes(libSearch.toLowerCase())||d.source.toLowerCase().includes(libSearch.toLowerCase()))&&
     (!libLevel||d.levels.includes(libLevel))&&(!libFocus||drillFocusTags(d).includes(libFocus))
   );
-  const sorted = [...filtered].sort((a,b)=>(favorites.includes(b.id)?1:0)-(favorites.includes(a.id)?1:0));
+  const sorted = [...filtered].sort((a,b) => {
+    const aFav = favorites.includes(a.id) ? 0 : 1;
+    const bFav = favorites.includes(b.id) ? 0 : 1;
+    if (aFav !== bFav) return aFav - bFav; // starred first
+    return a.name.localeCompare(b.name);   // then alphabetical
+  });
 
   return `
   <div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div><h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Drill Library</h2><p style="color:#475569;font-size:13px">Your curated drill database. ⭐ pins favourites to the top.</p></div>
-      <button class="btn" style="background:#e87722;padding:8px 16px;font-size:13px;font-weight:700" onclick="newDrill()">+ Add Drill</button>
+      <div><h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">Drill Library</h2><p style="color:#475569;font-size:15px">Your curated drill database. ⭐ pins favourites to the top.</p></div>
+      <button class="btn" style="background:#3b82f6;padding:8px 16px;font-size:15px;font-weight:700" onclick="newDrill()">+ Add Drill</button>
     </div>
     ${showDrillForm||editDrill?renderDrillForm():''}
     <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap">
-      <input style="flex:1;min-width:140px" placeholder="Search…" value="${libSearch}" oninput="setState({libSearch:this.value})"/>
-      <select style="width:130px" onchange="setState({libLevel:this.value})"><option value="">All levels</option>${LEVEL_OPTIONS().map(l=>`<option value="${l}" ${libLevel===l?'selected':''}>${l}</option>`).join('')}</select>
-      <select style="width:160px" onchange="setState({libFocus:this.value})">
+      <input style="flex:1;min-width:140px" id="lib-search-input" placeholder="Search…" value="${libSearch}" oninput="updateLibSearch(this.value)"/>
+      <select style="width:130px" onchange="updateLibFilter('libLevel',this.value)"><option value="">All levels</option>${LEVEL_OPTIONS().map(l=>`<option value="${l}" ${libLevel===l?'selected':''}>${l}</option>`).join('')}</select>
+      <select style="width:160px" onchange="updateLibFilter('libFocus',this.value)">
         <option value="">All skills</option>
         ${SKILLS().map(s=>`<option value="${s.id}" ${libFocus===s.id?'selected':''}>${s.label}</option>`).join('')}
       </select>
     </div>
-    <p style="color:#475569;font-size:12px;margin-bottom:8px">${sorted.length} drills · ${favorites.length} starred</p>
-    ${sorted.map(d=>renderDrillCard(d,{showFav:true,showEdit:true})).join('')}
+    <p id="drill-count" style="color:#475569;font-size:14px;margin-bottom:8px">${sorted.length} drill${sorted.length!==1?'s':''} · ${favorites.length} starred</p>
+    <div id="drill-list">${renderDrillList(sorted)}</div>
   </div>`;
+}
+
+function renderDrillList(drills) {
+  return drills.map(d => renderDrillCard(d, {showFav:true, showEdit:true})).join('');
 }
 
 function renderDrillCard(drill, opts={}) {
@@ -956,8 +1086,8 @@ function renderDrillCard(drill, opts={}) {
   const warn = playerCount > 0 && drill.players > 1 && playerCount < drill.players;
   const matched = matchedTags.filter(id => (drill.focus||[]).includes(id));
   const hasMatch = matched.length > 0;
-  const borderColor = hasMatch ? 'rgba(99,102,241,0.45)' : isFav ? 'rgba(232,119,34,0.3)' : warn ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.08)';
-  const bg = hasMatch ? 'rgba(99,102,241,0.06)' : isFav ? 'rgba(232,119,34,0.06)' : 'rgba(255,255,255,0.03)';
+  const borderColor = hasMatch ? 'rgba(99,102,241,0.45)' : isFav ? 'rgba(59,130,246,0.3)' : warn ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.08)';
+  const bg = hasMatch ? 'rgba(99,102,241,0.06)' : isFav ? 'rgba(59,130,246,0.06)' : 'rgba(255,255,255,0.03)';
   const id = 'dc_' + drill.id;
   return `
   <div style="background:${bg};border:1px solid ${borderColor};border-radius:10px;padding:${compact?'11px 13px':'15px 17px'};margin-bottom:9px;">
@@ -966,34 +1096,34 @@ function renderDrillCard(drill, opts={}) {
         <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
           <span>${drill.format==='game'?'🏀':'⚙️'}</span>
           ${isFav?'<span>⭐</span>':''}
-          <span class="condensed" style="font-size:15px;font-weight:700;color:#fff">${drill.name}</span>
-          ${warn?`<span style="font-size:11px;color:#ef4444;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:4px;padding:1px 6px">needs ${drill.players}+</span>`:''}
-          ${hasMatch?`<span style="font-size:11px;color:#818cf8;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:4px;padding:1px 7px;font-weight:700">matched</span>`:''}
-          ${drill.phase?`<span style="font-size:10px;color:#475569;background:#1e293b;border-radius:4px;padding:1px 6px">${drill.phase}</span>`:''}
+          <span class="condensed" style="font-size:17px;font-weight:700;color:#fff">${drill.name}</span>
+          ${warn?`<span style="font-size:13px;color:#ef4444;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:4px;padding:1px 6px">needs ${drill.players}+</span>`:''}
+          ${hasMatch?`<span style="font-size:13px;color:#818cf8;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);border-radius:4px;padding:1px 7px;font-weight:700">matched</span>`:''}
+          ${drill.phase?`<span style="font-size:12px;color:#475569;background:#111827;border-radius:4px;padding:1px 6px">${drill.phase}</span>`:''}
         </div>
         <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
           ${(drill.levels||[]).map(l=>badge(l,LEVEL_COLORS[l])).join('')}
           ${(drill.focus||[]).slice(0,3).map(id => {
             const isMatch = matchedTags.includes(id);
-            return `<span class="badge" style="background:${isMatch?'rgba(99,102,241,0.2)':'rgba(232,119,34,0.13)'};color:${isMatch?'#818cf8':'#e87722'};border:1px solid ${isMatch?'rgba(99,102,241,0.4)':'rgba(232,119,34,0.3)'};${isMatch?'font-weight:800;':''}">${isMatch?'→ ':''} ${skillLabel(id)}</span>`;
+            return `<span class="badge" style="background:${isMatch?'rgba(99,102,241,0.2)':'rgba(59,130,246,0.13)'};color:${isMatch?'#818cf8':'#3b82f6'};border:1px solid ${isMatch?'rgba(99,102,241,0.4)':'rgba(59,130,246,0.3)'};${isMatch?'font-weight:800;':''}">${isMatch?'→ ':''} ${skillLabel(id)}</span>`;
           }).join('')}
           ${badge((drill.duration||0)+'min','#94a3b8')}
           ${badge((drill.players<=1?'1':drill.players+'+')+' players', warn?'#ef4444':'#475569')}
         </div>
         ${hasMatch?`<div style="margin-top:7px;display:flex;align-items:center;gap:6px">
-          <span style="color:#818cf8;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Why chosen:</span>
-          <span style="color:#a5b4fc;font-size:11px">Addresses ${matched.map(id => '"'+skillLabel(id)+'"').join(', ')}</span>
+          <span style="color:#818cf8;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Why chosen:</span>
+          <span style="color:#a5b4fc;font-size:13px">Addresses ${matched.map(id => '"'+skillLabel(id)+'"').join(', ')}</span>
         </div>`:''}
       </div>
       <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
-        ${showFav?`<button onclick="toggleFav('${drill.id}')" style="background:none;border:none;cursor:pointer;font-size:15px;opacity:${isFav?1:.3}">⭐</button>`:''}
-        ${showEdit?`${btn('Edit','#334155',`editDrill('${drill.id}')`)} ${btn('✕','#7f1d1d',`deleteDrill('${drill.id}')`)} `:''}
+        ${showFav?`<button onclick="toggleFav('${drill.id}')" style="background:none;border:none;cursor:pointer;font-size:17px;opacity:${isFav?1:.3}">⭐</button>`:''}
+        ${showEdit?`${btn('Edit','#1e2d45',`editDrill('${drill.id}')`)} ${btn('✕','#7f1d1d',`deleteDrill('${drill.id}')`)} `:''}
       </div>
     </div>
     <div id="${id}" style="display:none;margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px">
-      <p style="color:#cbd5e1;font-size:13px;line-height:1.6;margin-bottom:8px">${drill.description}</p>
-      <p style="color:#94a3b8;font-size:12px"><strong style="color:#e87722">Cues: </strong>${(drill.coachingCues||[]).filter(Boolean).join(' · ')}</p>
-      <p style="color:#475569;font-size:11px;margin-top:6px">Source: ${drill.source}</p>
+      <p style="color:#cbd5e1;font-size:15px;line-height:1.6;margin-bottom:8px">${drill.description}</p>
+      <p style="color:#94a3b8;font-size:14px"><strong style="color:#3b82f6">Cues: </strong>${(drill.coachingCues||[]).filter(Boolean).join(' · ')}</p>
+      <p style="color:#475569;font-size:13px;margin-top:6px">Source: ${drill.source}</p>
     </div>
   </div>`;
 }
@@ -1004,7 +1134,7 @@ function renderDrillForm() {
   const f = Object.keys(_drillFormState).length > 0 ? {...base, ..._drillFormState} : base;
   return `
   <div class="form-box">
-    <h3 class="condensed" style="font-size:18px;color:#e87722;margin-bottom:14px">${state.editDrill?'Edit Drill':'Add Drill'}</h3>
+    <h3 class="condensed" style="font-size:21px;color:#3b82f6;margin-bottom:14px">${state.editDrill?'Edit Drill':'Add Drill'}</h3>
     <div class="grid2">
       <div class="span2"><div class="label">Name</div><input id="df-name" value="${f.name}"/></div>
       <div class="span2"><div class="label">Source / Credit</div><input id="df-source" value="${f.source}"/></div>
@@ -1013,24 +1143,24 @@ function renderDrillForm() {
       <div><div class="label">Duration (min)</div><input id="df-dur" type="number" value="${f.duration}"/></div>
       <div><div class="label">Min Players</div><input id="df-players" type="number" value="${f.players}" min="1"/></div>
       <div class="span2"><div class="label">Format</div>
-        <div class="toggle-row">${['game','skill'].map(ft=>`<button class="toggle-btn" id="df-fmt-${ft}" style="background:${f.format===ft?'#e87722':'#1e293b'}" onclick="setDrillFormat('${ft}')">${ft==='game'?'🏀':'⚙️'} ${ft}</button>`).join('')}</div>
+        <div class="toggle-row">${['game','skill'].map(ft=>`<button class="toggle-btn" id="df-fmt-${ft}" style="background:${f.format===ft?'#3b82f6':'#111827'}" onclick="setDrillFormat('${ft}')">${ft==='game'?'🏀':'⚙️'} ${ft}</button>`).join('')}</div>
       </div>
       <div class="span2"><div class="label">Levels</div>
-        <div class="toggle-row">${LEVEL_OPTIONS().map(l=>`<button class="toggle-btn" id="df-lvl-${l}" style="background:${f.levels.includes(l)?LEVEL_COLORS[l]:'#1e293b'}" onclick="toggleDrillLevel('${l}')">${l}</button>`).join('')}</div>
+        <div class="toggle-row">${LEVEL_OPTIONS().map(l=>`<button class="toggle-btn" id="df-lvl-${l}" style="background:${f.levels.includes(l)?LEVEL_COLORS[l]:'#111827'}" onclick="toggleDrillLevel('${l}')">${l}</button>`).join('')}</div>
       </div>
       <div class="span2">
-        <div class="label">Training Plan Phase <span style="color:#475569;font-size:10px;font-weight:400;text-transform:none">(which section of a session this drill belongs in)</span></div>
+        <div class="label">Training Plan Phase <span style="color:#475569;font-size:12px;font-weight:400;text-transform:none">(which section of a session this drill belongs in)</span></div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
           ${[
             {id:'warmup',      label:'Warm-Up / Activation', color:'#22c55e'},
             {id:'skill',       label:'Skill Development',    color:'#3b82f6'},
-            {id:'game',        label:'Game / Competition',   color:'#e87722'},
+            {id:'game',        label:'Game / Competition',   color:'#3b82f6'},
             {id:'conditioning',label:'Conditioning',         color:'#8b5cf6'},
             {id:'cooldown',    label:'Cool Down',            color:'#64748b'},
           ].map(p => {
             const on = (f.phase||'skill') === p.id;
             return `<button onclick="setDrillPhase('${p.id}')"
-              style="background:${on?p.color+'22':'#1e293b'};border:1px solid ${on?p.color+'88':'#334155'};border-radius:6px;padding:5px 12px;font-size:12px;color:${on?p.color:'#64748b'};cursor:pointer;font-family:inherit;font-weight:${on?700:400};transition:all .15s"
+              style="background:${on?p.color+'22':'#111827'};border:1px solid ${on?p.color+'88':'#1e2d45'};border-radius:6px;padding:5px 12px;font-size:14px;color:${on?p.color:'#64748b'};cursor:pointer;font-family:inherit;font-weight:${on?700:400};transition:all .15s"
             >${p.label}</button>`;
           }).join('')}
         </div>
@@ -1047,8 +1177,8 @@ function renderDrillForm() {
       <div class="span2"><div class="label">Cue 3</div><input id="df-c2" value="${f.coachingCues[2]||''}"/></div>
     </div>
     <div style="display:flex;gap:7px;margin-top:14px">
-      <button class="btn" style="background:#e87722;padding:8px 18px;font-size:13px" onclick="saveDrill()">Save</button>
-      <button class="btn" style="background:#334155;padding:8px 14px;font-size:13px" onclick="setState({showDrillForm:false,editDrill:null});_drillFormState={};">Cancel</button>
+      <button class="btn" style="background:#3b82f6;padding:8px 18px;font-size:15px" onclick="saveDrill()">Save</button>
+      <button class="btn" style="background:#1e2d45;padding:8px 14px;font-size:15px" onclick="setState({showDrillForm:false,editDrill:null});_drillFormState={};">Cancel</button>
     </div>
   </div>`;
 }
@@ -1060,34 +1190,34 @@ function renderConcepts() {
 
   if (conceptSelected) {
     const c = conceptSelected;
-    const color = CAT_COLORS[c.category]||'#e87722';
+    const color = CAT_COLORS[c.category]||'#3b82f6';
     return `
     <div>
-      <button class="btn" style="background:#1e293b;padding:7px 14px;font-size:12px;margin-bottom:20px" onclick="setState({conceptSelected:null})">← Back to Concepts</button>
+      <button class="btn" style="background:#111827;padding:7px 14px;font-size:14px;margin-bottom:20px" onclick="setState({conceptSelected:null})">← Back to Concepts</button>
       <div style="background:rgba(255,255,255,.02);border:1px solid ${color}44;border-radius:14px;padding:24px">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <span style="font-size:26px">${c.icon}</span>
-          <div>${badge(c.category,color)}<h2 class="condensed" style="font-size:24px;color:#fff;margin:6px 0 0">${c.title}</h2></div>
+          <span style="font-size:30px">${c.icon}</span>
+          <div>${badge(c.category,color)}<h2 class="condensed" style="font-size:28px;color:#fff;margin:6px 0 0">${c.title}</h2></div>
         </div>
-        <p style="color:#94a3b8;font-size:13px;line-height:1.7;margin:0 0 18px;border-bottom:1px solid #1e293b;padding-bottom:18px">${c.summary}</p>
-        <h3 class="condensed" style="font-size:14px;color:${color};letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Key Ideas</h3>
+        <p style="color:#94a3b8;font-size:15px;line-height:1.7;margin:0 0 18px;border-bottom:1px solid #111827;padding-bottom:18px">${c.summary}</p>
+        <h3 class="condensed" style="font-size:16px;color:${color};letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Key Ideas</h3>
         ${c.keyIdeas.map(idea=>{
           // Check if this idea contains example sub-items (lines starting with •)
           if (idea.includes('\n•')) {
             const [heading, ...lines] = idea.split('\n');
             return `<div style="margin-bottom:10px">
-              <div style="display:flex;gap:10px;margin-bottom:6px"><span style="color:${color};flex-shrink:0;margin-top:2px">→</span><p style="color:#cbd5e1;font-size:13px;line-height:1.6;margin:0;font-weight:600">${heading}</p></div>
+              <div style="display:flex;gap:10px;margin-bottom:6px"><span style="color:${color};flex-shrink:0;margin-top:2px">→</span><p style="color:#cbd5e1;font-size:15px;line-height:1.6;margin:0;font-weight:600">${heading}</p></div>
               <div style="margin-left:20px;display:grid;gap:5px">
-                ${lines.map(l=>l.trim()).filter(Boolean).map(l=>`<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:7px;padding:8px 12px;font-size:12px;color:#94a3b8;line-height:1.6">${l.replace(/^•\s*/,'<span style="color:'+color+';font-weight:700;margin-right:6px">→</span>')}</div>`).join('')}
+                ${lines.map(l=>l.trim()).filter(Boolean).map(l=>`<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:7px;padding:8px 12px;font-size:14px;color:#94a3b8;line-height:1.6">${l.replace(/^•\s*/,'<span style="color:'+color+';font-weight:700;margin-right:6px">→</span>')}</div>`).join('')}
               </div>
             </div>`;
           }
-          return `<div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:${color};flex-shrink:0;margin-top:2px">→</span><p style="color:#cbd5e1;font-size:13px;line-height:1.6;margin:0">${idea}</p></div>`;
+          return `<div style="display:flex;gap:10px;margin-bottom:8px"><span style="color:${color};flex-shrink:0;margin-top:2px">→</span><p style="color:#cbd5e1;font-size:15px;line-height:1.6;margin:0">${idea}</p></div>`;
         }).join('')}
-        <h3 class="condensed" style="font-size:14px;color:${color};letter-spacing:.06em;text-transform:uppercase;margin:18px 0 10px">Teaching Progression</h3>
-        ${c.teachingProgression.map((step,i)=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start"><span style="background:${color};color:#000;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</span><p style="color:#cbd5e1;font-size:13px;line-height:1.6;margin:0">${step}</p></div>`).join('')}
+        <h3 class="condensed" style="font-size:16px;color:${color};letter-spacing:.06em;text-transform:uppercase;margin:18px 0 10px">Teaching Progression</h3>
+        ${c.teachingProgression.map((step,i)=>`<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start"><span style="background:${color};color:#000;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${i+1}</span><p style="color:#cbd5e1;font-size:15px;line-height:1.6;margin:0">${step}</p></div>`).join('')}
         <div style="margin-top:16px;background:rgba(255,255,255,.03);border-radius:8px;padding:8px 12px">
-          <p style="color:#475569;font-size:11px;margin:0;font-style:italic">📖 ${c.saramaRef}</p>
+          <p style="color:#475569;font-size:13px;margin:0;font-style:italic">📖 ${c.saramaRef}</p>
         </div>
       </div>
     </div>`;
@@ -1097,21 +1227,21 @@ function renderConcepts() {
   return `
   <div>
     <div style="margin-bottom:20px">
-      <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Team Concepts</h2>
-      <p style="color:#475569;font-size:13px">Core ideas from <em style="color:#94a3b8">Transforming Basketball</em> — with how to teach them.</p>
+      <h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">Team Concepts</h2>
+      <p style="color:#475569;font-size:15px">Core ideas from <em style="color:#94a3b8">Transforming Basketball</em> — with how to teach them.</p>
     </div>
     <div class="toggle-row" style="margin-bottom:16px">
-      <button class="toggle-btn" style="background:${!conceptFilter?'#e87722':'#1e293b'}" onclick="setState({conceptFilter:''})">All</button>
-      ${cats.map(c=>`<button class="toggle-btn" style="background:${conceptFilter===c?(CAT_COLORS[c]||'#e87722'):'#1e293b'}" onclick="setState({conceptFilter:'${c}'})">${c}</button>`).join('')}
+      <button class="toggle-btn" style="background:${!conceptFilter?'#3b82f6':'#111827'}" onclick="setState({conceptFilter:''})">All</button>
+      ${cats.map(c=>`<button class="toggle-btn" style="background:${conceptFilter===c?(CAT_COLORS[c]||'#3b82f6'):'#111827'}" onclick="setState({conceptFilter:'${c}'})">${c}</button>`).join('')}
     </div>
     <div class="grid2">
-      ${filtered.map(c=>{const color=CAT_COLORS[c.category]||'#e87722';return`
+      ${filtered.map(c=>{const color=CAT_COLORS[c.category]||'#3b82f6';return`
       <div onclick="setState({conceptSelected:${JSON.stringify(c).replace(/"/g,'&quot;')}})" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px;cursor:pointer;transition:border-color .2s,background .2s" onmouseover="this.style.borderColor='${color}55';this.style.background='rgba(255,255,255,.055)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)';this.style.background='rgba(255,255,255,.03)'">
-        <div style="font-size:20px;margin-bottom:7px">${c.icon}</div>
+        <div style="font-size:23px;margin-bottom:7px">${c.icon}</div>
         ${badge(c.category,color)}
-        <h3 class="condensed" style="font-size:15px;color:#fff;margin:8px 0 5px">${c.title}</h3>
-        <p style="color:#64748b;font-size:12px;line-height:1.5;margin:0 0 8px">${c.summary.slice(0,80)}…</p>
-        <p style="color:${color};font-size:11px;margin:0">View →</p>
+        <h3 class="condensed" style="font-size:17px;color:#fff;margin:8px 0 5px">${c.title}</h3>
+        <p style="color:#64748b;font-size:14px;line-height:1.5;margin:0 0 8px">${c.summary.slice(0,80)}…</p>
+        <p style="color:${color};font-size:13px;margin:0">View →</p>
       </div>`;}).join('')}
     </div>
   </div>`;
@@ -1123,17 +1253,17 @@ function render() {
   const tabs = [['plan','Build Plan'],['players','Players'],['teams','Teams'],['library','Drill Library'],['concepts','Concepts']];
 
   document.getElementById('app').innerHTML = `
-  <div style="background:linear-gradient(180deg,#0d1b2e 0%,#060d18 100%);border-bottom:1px solid #1e293b;padding:0 20px">
+  <div style="background:linear-gradient(180deg,#0d1b2e 0%,#080c14 100%);border-bottom:1px solid #111827;padding:0 20px">
     <div style="max-width:780px;margin:0 auto">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px;flex-wrap:wrap;gap:8px">
         <div>
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:28px;height:28px;border-radius:7px;background:#e87722;display:flex;align-items:center;justify-content:center;font-size:15px">🏀</div>
-            <span class="condensed" style="font-size:22px;font-weight:800;color:#fff;letter-spacing:.04em">COURTCRAFT</span>
+            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 0 12px rgba(59,130,246,0.4)">🏀</div>
+            <span class="brand" style="font-size:32px;color:#fff;letter-spacing:.02em">CourtCraft</span>
           </div>
-          <p style="color:#334155;font-size:10px;margin:2px 0 0 10px;letter-spacing:.07em;text-transform:uppercase">Smart Practice Planner</p>
+          <p style="color:#1e2d45;font-size:12px;margin:2px 0 0 10px;letter-spacing:.07em;text-transform:uppercase">Smart Practice Planner</p>
         </div>
-        <div style="font-size:10px;color:#334155;text-align:right;line-height:1.7">
+        <div style="font-size:12px;color:#1e2d45;text-align:right;line-height:1.7">
           <div>${players.length} players · ${teams.length} teams</div>
           <div>${drills.length} drills · ${sessions.length} sessions</div>
         </div>
@@ -1143,7 +1273,7 @@ function render() {
       </div>
     </div>
   </div>
-  <div style="max-width:780px;margin:0 auto;padding:22px 20px 60px">
+  <div style="max-width:780px;margin:0 auto;padding:24px 20px 70px">
     ${tab==='plan'?renderPlanWizard():''}
     ${tab==='players'?renderPlayers():''}
     ${tab==='teams'?renderTeams():''}
@@ -1168,8 +1298,8 @@ function togglePlanFocus(id) {
     pills.forEach(btn => {
       const sid = btn.getAttribute('data-plan-skill');
       const on = state.planFocus.includes(sid);
-      btn.style.background = on ? '#e87722' : '#1e293b';
-      btn.style.borderColor = on ? '#e87722' : '#334155';
+      btn.style.background = on ? '#3b82f6' : '#111827';
+      btn.style.borderColor = on ? '#3b82f6' : '#1e2d45';
       btn.style.color = on ? '#fff' : '#64748b';
       btn.style.fontWeight = on ? 700 : 400;
     });
@@ -1249,15 +1379,15 @@ function editNote(entityId, entityType, noteId) {
   container.innerHTML = renderNoteFormHTML(_noteForm);
 }
 function renderNoteFormHTML(f) {
-  return `<div style="background:#0a1628;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:10px">
+  return `<div style="background:#0a1628;border:1px solid #1e2d45;border-radius:10px;padding:14px;margin-bottom:10px">
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
-      ${['Strength','Weakness','General'].map(c=>`<button class="toggle-btn" style="background:${(f.category||'Strength')===c?noteCatColor(c):'#1e293b'};font-size:10px;padding:3px 8px" onclick="setNoteCategory('${c}')">${c}</button>`).join('')}
+      ${['Strength','Weakness','General'].map(c=>`<button class="toggle-btn" style="background:${(f.category||'Strength')===c?noteCatColor(c):'#111827'};font-size:12px;padding:3px 8px" onclick="setNoteCategory('${c}')">${c}</button>`).join('')}
     </div>
     <input id="nf-title" style="margin-bottom:6px" placeholder="Title / observation" value="${f.title||''}"/>
     <textarea id="nf-content" style="height:56px;margin-bottom:8px" placeholder="Details…">${f.content||''}</textarea>
     <div style="display:flex;gap:6px">
-      <button class="btn" style="background:#e87722;padding:5px 14px;font-size:12px" onclick="saveNote()">Save</button>
-      <button class="btn" style="background:#334155;padding:5px 12px;font-size:12px" onclick="cancelNote()">Cancel</button>
+      <button class="btn" style="background:#3b82f6;padding:5px 14px;font-size:14px" onclick="saveNote()">Save</button>
+      <button class="btn" style="background:#1e2d45;padding:5px 12px;font-size:14px" onclick="cancelNote()">Cancel</button>
     </div>
   </div>`;
 }
@@ -1347,8 +1477,8 @@ function togglePlanFocus(id) {
     pills.forEach(btn => {
       const sid = btn.getAttribute('data-plan-skill');
       const on = state.planFocus.includes(sid);
-      btn.style.background = on ? '#e87722' : '#1e293b';
-      btn.style.borderColor = on ? '#e87722' : '#334155';
+      btn.style.background = on ? '#3b82f6' : '#111827';
+      btn.style.borderColor = on ? '#3b82f6' : '#1e2d45';
       btn.style.color = on ? '#fff' : '#64748b';
       btn.style.fontWeight = on ? 700 : 400;
     });
@@ -1428,15 +1558,15 @@ function editNote(entityId, entityType, noteId) {
   container.innerHTML = renderNoteFormHTML(_noteForm);
 }
 function renderNoteFormHTML(f) {
-  return `<div style="background:#0a1628;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:10px">
+  return `<div style="background:#0a1628;border:1px solid #1e2d45;border-radius:10px;padding:14px;margin-bottom:10px">
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
-      ${['Strength','Weakness','General'].map(c=>`<button class="toggle-btn" style="background:${(f.category||'Strength')===c?noteCatColor(c):'#1e293b'};font-size:10px;padding:3px 8px" onclick="setNoteCategory('${c}')">${c}</button>`).join('')}
+      ${['Strength','Weakness','General'].map(c=>`<button class="toggle-btn" style="background:${(f.category||'Strength')===c?noteCatColor(c):'#111827'};font-size:12px;padding:3px 8px" onclick="setNoteCategory('${c}')">${c}</button>`).join('')}
     </div>
     <input id="nf-title" style="margin-bottom:6px" placeholder="Title / observation" value="${f.title||''}"/>
     <textarea id="nf-content" style="height:56px;margin-bottom:8px" placeholder="Details…">${f.content||''}</textarea>
     <div style="display:flex;gap:6px">
-      <button class="btn" style="background:#e87722;padding:5px 14px;font-size:12px" onclick="saveNote()">Save</button>
-      <button class="btn" style="background:#334155;padding:5px 12px;font-size:12px" onclick="cancelNote()">Cancel</button>
+      <button class="btn" style="background:#3b82f6;padding:5px 14px;font-size:14px" onclick="saveNote()">Save</button>
+      <button class="btn" style="background:#1e2d45;padding:5px 12px;font-size:14px" onclick="cancelNote()">Cancel</button>
     </div>
   </div>`;
 }
@@ -1494,6 +1624,35 @@ function deleteNote(entityId, entityType, noteId) {
 }
 
 // Drills
+function updateLibFilter(key, val) {
+  state[key] = val;
+  // Preserve search input value then re-render
+  const searchEl = document.getElementById('lib-search-input');
+  if (searchEl) state.libSearch = searchEl.value;
+  render();
+}
+function updateLibSearch(val) {
+  state.libSearch = val;
+  // Re-render only the drill list, not the whole page, to preserve input focus
+  const listEl = document.getElementById('drill-list');
+  if (listEl) {
+    const { drills, favorites, libSearch, libLevel, libFocus } = state;
+    const filtered = drills.filter(d =>
+      (!libSearch||d.name.toLowerCase().includes(libSearch.toLowerCase())||d.source.toLowerCase().includes(libSearch.toLowerCase()))&&
+      (!libLevel||d.levels.includes(libLevel))&&(!libFocus||drillFocusTags(d).includes(libFocus))
+    );
+    const sorted = [...filtered].sort((a,b) => {
+      const aFav = favorites.includes(a.id) ? 0 : 1;
+      const bFav = favorites.includes(b.id) ? 0 : 1;
+      if (aFav !== bFav) return aFav - bFav;
+      return a.name.localeCompare(b.name);
+    });
+    listEl.innerHTML = renderDrillList(sorted);
+    document.getElementById('drill-count').textContent = sorted.length + ' drill' + (sorted.length!==1?'s':'') + ' · ' + favorites.length + ' starred';
+  } else {
+    render();
+  }
+}
 function newDrill() { state.editDrill=null; state.showDrillForm=true; _drillFormState={}; render(); }
 function editDrill(id) { state.editDrill=state.drills.find(d=>d.id===id); state.showDrillForm=false; _drillFormState={}; render(); }
 function deleteDrill(id) {  state.drills=state.drills.filter(d=>d.id!==id); persist(); render(); }
@@ -1526,7 +1685,7 @@ function setDrillFormat(fmt) {
   _drillFormState = {..._getDrillFormBase(), ..._drillFormState, format: fmt};
   // Just update the format buttons in place
   document.querySelectorAll('[id^="df-fmt-"]').forEach(b =>
-    b.style.background = (b.id === 'df-fmt-'+fmt ? '#e87722' : '#1e293b')
+    b.style.background = (b.id === 'df-fmt-'+fmt ? '#3b82f6' : '#111827')
   );
 }
 function toggleDrillLevel(l) {
@@ -1538,15 +1697,15 @@ function toggleDrillLevel(l) {
   // Just update the level buttons in place
   document.querySelectorAll('[id^="df-lvl-"]').forEach(b => {
     const lv = b.id.replace('df-lvl-','');
-    b.style.background = newLevels.includes(lv) ? (LEVEL_COLORS[lv]||'#e87722') : '#1e293b';
+    b.style.background = newLevels.includes(lv) ? (LEVEL_COLORS[lv]||'#3b82f6') : '#111827';
   });
 }
 function renderDrillSkillsList(focus) {
-  return SKILLS().filter(s => s.focusTag).map(skill => {
+  return SKILLS().map(skill => {
     const on = (focus||[]).includes(skill.id);
     return `<button
       onclick="toggleDrillSkill('${skill.id}')"
-      style="background:${on?'#e87722':'#1e293b'};border:1px solid ${on?'#e87722':'#334155'};border-radius:6px;padding:5px 12px;font-size:12px;color:${on?'#fff':'#64748b'};cursor:pointer;font-family:inherit;font-weight:${on?700:400};transition:all .15s"
+      style="background:${on?'#3b82f6':'#111827'};border:1px solid ${on?'#3b82f6':'#1e2d45'};border-radius:6px;padding:5px 12px;font-size:14px;color:${on?'#fff':'#64748b'};cursor:pointer;font-family:inherit;font-weight:${on?700:400};transition:all .15s"
     >${skill.label}</button>`;
   }).join('');
 }
@@ -1584,7 +1743,7 @@ function saveDrill() {
     format: _drillFormState.format||base.format,
     levels: _drillFormState.levels?.length?_drillFormState.levels:base.levels,
     focus: _drillFormState.focus?.length?_drillFormState.focus:base.focus,
-    phase: _drillFormState.phase||base.phase||'skill',us,
+    phase: _drillFormState.phase||base.phase||'skill',
   };
   if(state.editDrill) state.drills=state.drills.map(x=>x.id===d.id?d:x);
   else state.drills=[...state.drills,d];
@@ -1675,7 +1834,7 @@ function buildWheelItems() {
     { id:'quiz-med', name:'Brain Test', icon:'🧩', type:'quiz', difficulty:'medium', color:'#8b5cf6' },
     { id:'quiz-hard', name:'Expert Quiz', icon:'🏆', type:'quiz', difficulty:'hard', color:'#f59e0b' },
   ];
-  const drillItems = drills.slice(0, 8).map(d => ({ id:d.id, name:d.name, icon:d.format==='game'?'🏀':'⚙️', type:'drill', color:'#e87722', drill:d }));
+  const drillItems = drills.slice(0, 8).map(d => ({ id:d.id, name:d.name, icon:d.format==='game'?'🏀':'⚙️', type:'drill', color:'#3b82f6', drill:d }));
   return [...drillItems, ...quizItem].slice(0, 10);
 }
 
@@ -1684,15 +1843,15 @@ function renderGames() {
   return `
   <div>
     <div style="margin-bottom:20px">
-      <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Games & Challenges</h2>
-      <p style="color:#475569;font-size:13px">Spin the wheel, test basketball IQ, and track player points.</p>
+      <h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">Games & Challenges</h2>
+      <p style="color:#475569;font-size:15px">Spin the wheel, test basketball IQ, and track player points.</p>
     </div>
 
     <!-- Section nav -->
     <div class="toggle-row" style="margin-bottom:24px">
-      <button class="toggle-btn" id="gsec-wheel" style="background:${gState.gameSection==='wheel'||!gState.gameSection?'#e87722':'#1e293b'};padding:7px 16px;font-size:12px" onclick="setGameSection('wheel')">🎡 Spin the Wheel</button>
-      <button class="toggle-btn" id="gsec-quiz" style="background:${gState.gameSection==='quiz'?'#e87722':'#1e293b'};padding:7px 16px;font-size:12px" onclick="setGameSection('quiz')">🧠 IQ Quiz</button>
-      <button class="toggle-btn" id="gsec-scores" style="background:${gState.gameSection==='scores'?'#e87722':'#1e293b'};padding:7px 16px;font-size:12px" onclick="setGameSection('scores')">🏆 Scoreboard</button>
+      <button class="toggle-btn" id="gsec-wheel" style="background:${gState.gameSection==='wheel'||!gState.gameSection?'#3b82f6':'#111827'};padding:7px 16px;font-size:14px" onclick="setGameSection('wheel')">🎡 Spin the Wheel</button>
+      <button class="toggle-btn" id="gsec-quiz" style="background:${gState.gameSection==='quiz'?'#3b82f6':'#111827'};padding:7px 16px;font-size:14px" onclick="setGameSection('quiz')">🧠 IQ Quiz</button>
+      <button class="toggle-btn" id="gsec-scores" style="background:${gState.gameSection==='scores'?'#3b82f6':'#111827'};padding:7px 16px;font-size:14px" onclick="setGameSection('scores')">🏆 Scoreboard</button>
     </div>
 
     <div id="game-content">
@@ -1705,7 +1864,7 @@ function setGameSection(s) {
   gState.gameSection = s;
   gState.activeQuiz = null; gState.quizAnswered = false; gState.quizSelected = null;
   document.getElementById('game-content').innerHTML = renderGameSection();
-  document.querySelectorAll('[id^="gsec-"]').forEach(b=>b.style.background=(b.id==='gsec-'+s?'#e87722':'#1e293b'));
+  document.querySelectorAll('[id^="gsec-"]').forEach(b=>b.style.background=(b.id==='gsec-'+s?'#3b82f6':'#111827'));
 }
 
 function renderGameSection() {
@@ -1719,10 +1878,10 @@ function renderGameSection() {
 // ── Spin the Wheel ────────────────────────────────────────────────
 function renderWheel() {
   const items = buildWheelItems();
-  if (items.length < 2) return `<p style="color:#475569;font-size:13px">Add more drills to your library to use the wheel.</p>`;
+  if (items.length < 2) return `<p style="color:#475569;font-size:15px">Add more drills to your library to use the wheel.</p>`;
   const n = items.length;
   const arc = 360 / n;
-  const colors = ['#e87722','#3b82f6','#22c55e','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#f97316','#10b981','#ec4899'];
+  const colors = ['#3b82f6','#3b82f6','#22c55e','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#f97316','#10b981','#ec4899'];
   const r = 130, cx = 150, cy = 150;
 
   // SVG wheel slices
@@ -1740,7 +1899,7 @@ function renderWheel() {
     const mid = polarToCart(midAngle, r * 0.62);
     const color = colors[i % colors.length];
     return `
-      <path d="M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${large} 1 ${end.x} ${end.y} Z" fill="${color}" stroke="#060d18" stroke-width="2"/>
+      <path d="M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${large} 1 ${end.x} ${end.y} Z" fill="${color}" stroke="#080c14" stroke-width="2"/>
       <text x="${mid.x}" y="${mid.y}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#fff" font-family="IBM Plex Sans,sans-serif" font-weight="600" transform="rotate(${midAngle},${mid.x},${mid.y})">${items[i].icon}</text>`;
   }
 
@@ -1751,32 +1910,32 @@ function renderWheel() {
   <div style="text-align:center">
     <!-- Filter -->
     <div class="toggle-row" style="justify-content:center;margin-bottom:20px">
-      <span style="color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;align-self:center;margin-right:4px">Include:</span>
-      ${[['all','Drills + Quiz'],['drills','Drills Only'],['quiz','Quiz Only']].map(([v,l])=>`<button class="toggle-btn" style="background:${gState.wheelFilter===v?'#e87722':'#1e293b'};font-size:11px" onclick="setWheelFilter('${v}')">${l}</button>`).join('')}
+      <span style="color:#64748b;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;align-self:center;margin-right:4px">Include:</span>
+      ${[['all','Drills + Quiz'],['drills','Drills Only'],['quiz','Quiz Only']].map(([v,l])=>`<button class="toggle-btn" style="background:${gState.wheelFilter===v?'#3b82f6':'#111827'};font-size:13px" onclick="setWheelFilter('${v}')">${l}</button>`).join('')}
     </div>
 
     <!-- Wheel -->
     <div style="position:relative;display:inline-block;margin-bottom:20px">
-      <svg id="spin-wheel" width="300" height="300" style="filter:drop-shadow(0 0 20px rgba(232,119,34,0.3));transition:transform 0s">
+      <svg id="spin-wheel" width="300" height="300" style="filter:drop-shadow(0 0 20px rgba(59,130,246,0.3));transition:transform 0s">
         <g id="wheel-slices" style="transform-origin:150px 150px;transform:rotate(${gState.spinAngle}deg)">
           ${slices}
-          <circle cx="${cx}" cy="${cy}" r="22" fill="#0f172a" stroke="#e87722" stroke-width="3"/>
-          <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#e87722">🏀</text>
+          <circle cx="${cx}" cy="${cy}" r="22" fill="#0d1420" stroke="#3b82f6" stroke-width="3"/>
+          <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#3b82f6">🏀</text>
         </g>
         <!-- Pointer -->
-        <polygon points="${cx},${cy-r-10} ${cx-8},${cy-r+8} ${cx+8},${cy-r+8}" fill="#e87722"/>
+        <polygon points="${cx},${cy-r-10} ${cx-8},${cy-r+8} ${cx+8},${cy-r+8}" fill="#3b82f6"/>
       </svg>
     </div>
 
     <!-- Spin button -->
     <div style="margin-bottom:20px">
-      <button onclick="spinWheel()" ${gState.spinning?'disabled':''} style="background:${gState.spinning?'#334155':'#e87722'};color:#fff;border:none;border-radius:10px;padding:13px 36px;font-size:16px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:${gState.spinning?'not-allowed':'pointer'}">
+      <button onclick="spinWheel()" ${gState.spinning?'disabled':''} style="background:${gState.spinning?'#1e2d45':'#3b82f6'};color:#fff;border:none;border-radius:10px;padding:13px 36px;font-size:18px;font-weight:700;font-family:'Permanent Marker',cursive;letter-spacing:.06em;text-transform:uppercase;cursor:${gState.spinning?'not-allowed':'pointer'}">
         ${gState.spinning?'Spinning…':'🎡 Spin!'}
       </button>
     </div>
 
     <!-- Result -->
-    ${result ? renderSpinResult(result) : '<p style="color:#334155;font-size:13px">Spin to select the next drill or challenge!</p>'}
+    ${result ? renderSpinResult(result) : '<p style="color:#1e2d45;font-size:15px">Spin to select the next drill or challenge!</p>'}
   </div>`;
 }
 
@@ -1785,31 +1944,31 @@ function renderSpinResult(item) {
     return `
     <div style="background:rgba(255,255,255,.03);border:1px solid ${item.color}44;border-radius:12px;padding:20px;text-align:left;max-width:500px;margin:0 auto">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <span style="font-size:24px">${item.icon}</span>
+        <span style="font-size:28px">${item.icon}</span>
         <div>
           <span class="badge" style="background:${item.color}22;color:${item.color};border:1px solid ${item.color}44">${item.difficulty} quiz</span>
-          <h3 class="condensed" style="font-size:18px;color:#fff;margin:4px 0 0">${item.name}</h3>
+          <h3 class="condensed" style="font-size:21px;color:#fff;margin:4px 0 0">${item.name}</h3>
         </div>
       </div>
-      <button onclick="launchQuizFromWheel('${item.difficulty}')" style="background:${item.color};color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;width:100%">Start Quiz →</button>
+      <button onclick="launchQuizFromWheel('${item.difficulty}')" style="background:${item.color};color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;width:100%">Start Quiz →</button>
     </div>`;
   }
   const d = item.drill;
   if (!d) return '';
   return `
-  <div style="background:rgba(255,255,255,.03);border:1px solid #e8772244;border-radius:12px;padding:20px;text-align:left;max-width:500px;margin:0 auto">
+  <div style="background:rgba(255,255,255,.03);border:1px solid #3b82f644;border-radius:12px;padding:20px;text-align:left;max-width:500px;margin:0 auto">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <span style="font-size:24px">🏀</span>
+      <span style="font-size:28px">🏀</span>
       <div>
-        <span class="badge" style="background:#e8772222;color:#e87722;border:1px solid #e8772244">${d.format} · ${d.duration}min</span>
-        <h3 class="condensed" style="font-size:18px;color:#fff;margin:4px 0 0">${d.name}</h3>
+        <span class="badge" style="background:#3b82f622;color:#3b82f6;border:1px solid #3b82f644">${d.format} · ${d.duration}min</span>
+        <h3 class="condensed" style="font-size:21px;color:#fff;margin:4px 0 0">${d.name}</h3>
       </div>
     </div>
-    <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin-bottom:10px">${d.description}</p>
-    <p style="color:#64748b;font-size:12px;margin-bottom:12px"><strong style="color:#e87722">Cues: </strong>${d.coachingCues.filter(Boolean).join(' · ')}</p>
+    <p style="color:#94a3b8;font-size:15px;line-height:1.6;margin-bottom:10px">${d.description}</p>
+    <p style="color:#64748b;font-size:14px;margin-bottom:12px"><strong style="color:#3b82f6">Cues: </strong>${d.coachingCues.filter(Boolean).join(' · ')}</p>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
       ${d.levels.map(l=>badge(l,LEVEL_COLORS[l])).join('')}
-      ${d.focus.slice(0,3).map(f=>badge(f,'#e87722')).join('')}
+      ${d.focus.slice(0,3).map(f=>badge(f,'#3b82f6')).join('')}
     </div>
     ${renderAwardPoints('drill-complete', d.name)}
   </div>`;
@@ -1818,14 +1977,14 @@ function renderSpinResult(item) {
 function renderAwardPoints(reason, label) {
   const pts = [50, 100, 150, 200];
   return `
-  <div style="border-top:1px solid #1e293b;padding-top:12px">
-    <p style="color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Award Points for completing "${label}"</p>
+  <div style="border-top:1px solid #111827;padding-top:12px">
+    <p style="color:#64748b;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Award Points for completing "${label}"</p>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-      ${pts.map(p=>`<button class="toggle-btn" style="background:${gState.awardPts===p?'#22c55e':'#1e293b'};font-size:12px;padding:5px 12px" onclick="setAwardPts(${p})">${p} pts</button>`).join('')}
+      ${pts.map(p=>`<button class="toggle-btn" style="background:${gState.awardPts===p?'#22c55e':'#111827'};font-size:14px;padding:5px 12px" onclick="setAwardPts(${p})">${p} pts</button>`).join('')}
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
-      ${state.players.length===0?`<p style="color:#334155;font-size:12px;font-style:italic">Add players to award points.</p>`:''}
-      ${state.players.map(p=>`<button class="toggle-btn" style="background:#1e293b;font-size:11px;padding:4px 10px" onclick="awardPoints('${p.id}','${p.name}','${reason}',${gState.awardPts||100})">${p.name} +${gState.awardPts||100}</button>`).join('')}
+      ${state.players.length===0?`<p style="color:#1e2d45;font-size:14px;font-style:italic">Add players to award points.</p>`:''}
+      ${state.players.map(p=>`<button class="toggle-btn" style="background:#111827;font-size:13px;padding:4px 10px" onclick="awardPoints('${p.id}','${p.name}','${reason}',${gState.awardPts||100})">${p.name} +${gState.awardPts||100}</button>`).join('')}
     </div>
   </div>`;
 }
@@ -1880,23 +2039,23 @@ function renderQuizSection() {
   return `
   <div>
     <div style="margin-bottom:16px">
-      <p style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Category</p>
+      <p style="color:#64748b;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Category</p>
       <div class="toggle-row">
-        ${cats.map(c=>`<button class="toggle-btn" style="background:${gState.quizFilter===c||(!gState.quizFilter&&c==='all')?'#e87722':'#1e293b'};font-size:11px" onclick="setQuizFilter('${c}')">${c}</button>`).join('')}
+        ${cats.map(c=>`<button class="toggle-btn" style="background:${gState.quizFilter===c||(!gState.quizFilter&&c==='all')?'#3b82f6':'#111827'};font-size:13px" onclick="setQuizFilter('${c}')">${c}</button>`).join('')}
       </div>
     </div>
     <div style="margin-bottom:16px">
-      <p style="color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Difficulty</p>
+      <p style="color:#64748b;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Difficulty</p>
       <div class="toggle-row">
-        ${diffs.map(d=>`<button class="toggle-btn" style="background:${(gState.quizDiff||'all')===d?(d==='all'?'#e87722':diffColors[d]||'#e87722'):'#1e293b'};font-size:11px" onclick="setQuizDiff('${d}')">${d}</button>`).join('')}
+        ${diffs.map(d=>`<button class="toggle-btn" style="background:${(gState.quizDiff||'all')===d?(d==='all'?'#3b82f6':diffColors[d]||'#3b82f6'):'#111827'};font-size:13px" onclick="setQuizDiff('${d}')">${d}</button>`).join('')}
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button onclick="launchRandomQuiz()" style="background:#e87722;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;flex:1">
+      <button onclick="launchRandomQuiz()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;flex:1">
         🎲 Random Question
       </button>
     </div>
-    <p style="color:#475569;font-size:12px;margin-bottom:10px">${filtered.length} questions</p>
+    <p style="color:#475569;font-size:14px;margin-bottom:10px">${filtered.length} questions</p>
     ${filtered.map(q=>`
     <div onclick="launchQuiz('${q.id}')" class="card" style="cursor:pointer">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
@@ -1906,9 +2065,9 @@ function renderQuizSection() {
             ${badge(q.difficulty, diffColors[q.difficulty]||'#64748b')}
             ${badge(q.points+' pts', ptColors[q.points]||'#64748b')}
           </div>
-          <p style="color:#e2e8f0;font-size:13px;line-height:1.5;margin:0">${q.question}</p>
+          <p style="color:#e2e8f0;font-size:15px;line-height:1.5;margin:0">${q.question}</p>
         </div>
-        <span style="color:#e87722;font-size:13px;flex-shrink:0">→</span>
+        <span style="color:#3b82f6;font-size:15px;flex-shrink:0">→</span>
       </div>
     </div>`).join('')}
   </div>`;
@@ -1922,36 +2081,36 @@ function renderActiveQuiz() {
 
   return `
   <div style="max-width:540px">
-    <button class="btn" style="background:#1e293b;padding:6px 12px;font-size:11px;margin-bottom:16px" onclick="closeQuiz()">← Back to Quiz List</button>
+    <button class="btn" style="background:#111827;padding:6px 12px;font-size:13px;margin-bottom:16px" onclick="closeQuiz()">← Back to Quiz List</button>
     <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:22px">
       <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
         ${badge(q.category,'#3b82f6')}
         ${badge(q.difficulty,diffColors[q.difficulty]||'#64748b')}
         ${badge(q.points+' pts for correct','#f59e0b')}
       </div>
-      <p style="color:#fff;font-size:16px;line-height:1.6;font-weight:600;margin-bottom:18px">${q.question}</p>
+      <p style="color:#fff;font-size:18px;line-height:1.6;font-weight:600;margin-bottom:18px">${q.question}</p>
       <div style="display:grid;gap:8px;margin-bottom:16px">
         ${q.options.map((opt,i)=>{
-          let bg = '#1e293b', border = 'rgba(255,255,255,0.08)', textColor = '#e2e8f0';
+          let bg = '#111827', border = 'rgba(255,255,255,0.08)', textColor = '#e2e8f0';
           if (answered) {
             if (i === q.answer) { bg='rgba(34,197,94,0.15)'; border='#22c55e'; textColor='#22c55e'; }
             else if (i === selected) { bg='rgba(239,68,68,0.15)'; border='#ef4444'; textColor='#ef4444'; }
-          } else if (i === selected) { bg='rgba(232,119,34,0.15)'; border='#e87722'; textColor='#e87722'; }
-          return `<div onclick="${answered?'':'selectAnswer('+i+')'}" style="background:${bg};border:1px solid ${border};border-radius:8px;padding:12px 14px;cursor:${answered?'default':'pointer'};color:${textColor};font-size:13px;line-height:1.5;transition:all .15s">
+          } else if (i === selected) { bg='rgba(59,130,246,0.15)'; border='#3b82f6'; textColor='#3b82f6'; }
+          return `<div onclick="${answered?'':'selectAnswer('+i+')'}" style="background:${bg};border:1px solid ${border};border-radius:8px;padding:12px 14px;cursor:${answered?'default':'pointer'};color:${textColor};font-size:15px;line-height:1.5;transition:all .15s">
             <span style="font-weight:700;margin-right:8px">${['A','B','C','D'][i]}.</span>${opt}
           </div>`;
         }).join('')}
       </div>
-      ${!answered?`<button onclick="submitAnswer()" ${selected===null||selected===undefined?'disabled':''} style="background:${selected!==null&&selected!==undefined?'#e87722':'#334155'};color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;font-family:inherit;cursor:${selected!==null&&selected!==undefined?'pointer':'not-allowed'};width:100%">Submit Answer</button>`:''}
+      ${!answered?`<button onclick="submitAnswer()" ${selected===null||selected===undefined?'disabled':''} style="background:${selected!==null&&selected!==undefined?'#3b82f6':'#1e2d45'};color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:15px;font-weight:700;font-family:inherit;cursor:${selected!==null&&selected!==undefined?'pointer':'not-allowed'};width:100%">Submit Answer</button>`:''}
       ${answered?`
       <div style="background:${selected===q.answer?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.1)'};border:1px solid ${selected===q.answer?'#22c55e44':'#ef444444'};border-radius:8px;padding:14px;margin-bottom:14px">
-        <p style="color:${selected===q.answer?'#22c55e':'#ef4444'};font-size:14px;font-weight:700;margin-bottom:6px">${selected===q.answer?'✓ Correct! +'+q.points+' points':'✗ Not quite'}</p>
-        <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0">${q.explanation}</p>
+        <p style="color:${selected===q.answer?'#22c55e':'#ef4444'};font-size:16px;font-weight:700;margin-bottom:6px">${selected===q.answer?'✓ Correct! +'+q.points+' points':'✗ Not quite'}</p>
+        <p style="color:#94a3b8;font-size:15px;line-height:1.6;margin:0">${q.explanation}</p>
       </div>
       ${selected===q.answer?renderAwardPoints('quiz-correct',q.question.slice(0,40)+'…'):''}
       <div style="display:flex;gap:8px;margin-top:12px">
-        <button onclick="launchRandomQuiz()" style="background:#e87722;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;flex:1">Next Question 🎲</button>
-        <button onclick="closeQuiz()" style="background:#1e293b;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer">Back to List</button>
+        <button onclick="launchRandomQuiz()" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;flex:1">Next Question 🎲</button>
+        <button onclick="closeQuiz()" style="background:#111827;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer">Back to List</button>
       </div>`:''}
     </div>
   </div>`;
@@ -1979,56 +2138,56 @@ function renderScoreboard() {
     .map(p=>({...p, pts: scores[p.id]||0}))
     .sort((a,b)=>b.pts-a.pts);
 
-  const medalColor = i => ['#f59e0b','#94a3b8','#cd7c2f'][i]||'#334155';
+  const medalColor = i => ['#f59e0b','#94a3b8','#cd7c2f'][i]||'#1e2d45';
   const medalIcon = i => ['🥇','🥈','🥉'][i]||'#';
 
   return `
   <div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h3 class="condensed" style="font-size:18px;color:#fff">Session Leaderboard</h3>
-      <button class="btn" style="background:#7f1d1d;padding:6px 12px;font-size:11px" onclick="resetScores()">Reset Scores</button>
+      <h3 class="condensed" style="font-size:21px;color:#fff">Session Leaderboard</h3>
+      <button class="btn" style="background:#7f1d1d;padding:6px 12px;font-size:13px" onclick="resetScores()">Reset Scores</button>
     </div>
 
-    ${state.players.length===0?`<p style="color:#475569;font-size:13px;margin-bottom:20px">Add players in the Players tab to track scores.</p>`:
+    ${state.players.length===0?`<p style="color:#475569;font-size:15px;margin-bottom:20px">Add players in the Players tab to track scores.</p>`:
     `<div style="margin-bottom:24px">
       ${sorted.map((p,i)=>`
       <div style="background:rgba(255,255,255,.03);border:1px solid ${i===0&&p.pts>0?'rgba(245,158,11,0.3)':'rgba(255,255,255,0.07)'};border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px">
-        <span style="font-size:20px;width:28px;text-align:center">${p.pts>0?medalIcon(i):'—'}</span>
+        <span style="font-size:23px;width:28px;text-align:center">${p.pts>0?medalIcon(i):'—'}</span>
         <div style="flex:1">
-          <p style="color:#fff;font-size:15px;font-weight:700;font-family:'Barlow Condensed',sans-serif;margin:0 0 2px">${p.name}</p>
+          <p style="color:#fff;font-size:17px;font-weight:700;font-family:'Permanent Marker',cursive;margin:0 0 2px">${p.name}</p>
           <div style="display:flex;gap:5px">${p.level?badge(p.level,LEVEL_COLORS[p.level]):''}</div>
         </div>
         <div style="text-align:right">
-          <p style="color:${p.pts>0?medalColor(i):'#334155'};font-size:22px;font-weight:800;font-family:'Barlow Condensed',sans-serif;margin:0">${p.pts}</p>
-          <p style="color:#475569;font-size:10px;margin:0">points</p>
+          <p style="color:${p.pts>0?medalColor(i):'#1e2d45'};font-size:25px;font-weight:800;font-family:'Permanent Marker',cursive;margin:0">${p.pts}</p>
+          <p style="color:#475569;font-size:12px;margin:0">points</p>
         </div>
       </div>`).join('')}
     </div>`}
 
     <!-- Manual award -->
-    <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:20px">
-      <p style="color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Award Points Manually</p>
+    <div style="background:#0d1420;border:1px solid #1e2d45;border-radius:12px;padding:16px;margin-bottom:20px">
+      <p style="color:#64748b;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Award Points Manually</p>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-        ${[50,100,150,200,300].map(p=>`<button class="toggle-btn" style="background:${gState.manualPts===p?'#22c55e':'#1e293b'};font-size:12px;padding:5px 12px" onclick="setManualPts(${p})">${p} pts</button>`).join('')}
+        ${[50,100,150,200,300].map(p=>`<button class="toggle-btn" style="background:${gState.manualPts===p?'#22c55e':'#111827'};font-size:14px;padding:5px 12px" onclick="setManualPts(${p})">${p} pts</button>`).join('')}
       </div>
       <input id="award-reason" placeholder="Reason (e.g. Made 5 layups in a row)" style="margin-bottom:8px"/>
       <div class="toggle-row">
-        ${state.players.map(p=>`<button class="toggle-btn" style="background:#1e293b;font-size:11px" onclick="manualAward('${p.id}','${p.name}')">${p.name}</button>`).join('')}
+        ${state.players.map(p=>`<button class="toggle-btn" style="background:#111827;font-size:13px" onclick="manualAward('${p.id}','${p.name}')">${p.name}</button>`).join('')}
       </div>
     </div>
 
     <!-- Activity log -->
     ${log.length>0?`
     <div>
-      <p style="color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Activity Log</p>
+      <p style="color:#64748b;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Activity Log</p>
       <div style="max-height:240px;overflow-y:auto">
         ${[...log].reverse().slice(0,20).map(entry=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid #1e293b">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid #111827">
           <div>
-            <span style="color:#e2e8f0;font-size:12px;font-weight:600">${entry.playerName}</span>
-            <span style="color:#475569;font-size:11px;margin-left:8px">${entry.reason}</span>
+            <span style="color:#e2e8f0;font-size:14px;font-weight:600">${entry.playerName}</span>
+            <span style="color:#475569;font-size:13px;margin-left:8px">${entry.reason}</span>
           </div>
-          <span style="color:#22c55e;font-size:13px;font-weight:700">+${entry.points}</span>
+          <span style="color:#22c55e;font-size:15px;font-weight:700">+${entry.points}</span>
         </div>`).join('')}
       </div>
     </div>`:''}
@@ -2107,12 +2266,12 @@ function renderSettings() {
   return `
   <div>
     <div style="margin-bottom:20px">
-      <h2 class="condensed" style="font-size:22px;color:#fff;margin-bottom:4px">Settings</h2>
-      <p style="color:#475569;font-size:13px">Manage picklists, player attributes, and app defaults.</p>
+      <h2 class="condensed" style="font-size:28px;color:#fff;margin-bottom:4px">Settings</h2>
+      <p style="color:#475569;font-size:15px">Manage picklists, player attributes, and app defaults.</p>
     </div>
 
     <div class="toggle-row" style="margin-bottom:24px">
-      ${sections.map(([key,label])=>`<button class="toggle-btn" style="background:${s===key?'#e87722':'#1e293b'};padding:7px 14px;font-size:12px" onclick="setSettingsSection('${key}')">${label}</button>`).join('')}
+      ${sections.map(([key,label])=>`<button class="toggle-btn" style="background:${s===key?'#3b82f6':'#111827'};padding:7px 14px;font-size:14px" onclick="setSettingsSection('${key}')">${label}</button>`).join('')}
     </div>
 
     <div id="settings-content">
@@ -2126,7 +2285,7 @@ function setSettingsSection(s) {
   const el = document.getElementById('settings-content');
   if (el) el.innerHTML = renderSettingsSection(s);
   document.querySelectorAll('.toggle-row .toggle-btn').forEach(b => {
-    if (b.textContent.includes(s)) b.style.background = '#e87722';
+    if (b.textContent.includes(s)) b.style.background = '#3b82f6';
   });
 }
 
@@ -2142,14 +2301,14 @@ function renderAttributeSettings() {
   return `
   <div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-      <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0">Skills are a single shared list used on both drills and player profiles. Tag a skill on a drill to indicate what it develops. Rate a skill on a player to indicate strength or weakness. <strong style="color:#ef4444">Weakness ratings</strong> automatically prioritise drills that share the same skill when generating a plan.</p>
-      <button class="btn" style="background:#e87722;padding:7px 14px;font-size:12px;font-weight:700;flex-shrink:0" onclick="showAddAttribute()">+ Add Skill</button>
+      <p style="color:#94a3b8;font-size:15px;line-height:1.6;margin:0">Skills are a single shared list used on both drills and player profiles. Tag a skill on a drill to indicate what it develops. Rate a skill on a player to indicate strength or weakness. <strong style="color:#ef4444">Weakness ratings</strong> automatically prioritise drills that share the same skill when generating a plan.</p>
+      <button class="btn" style="background:#3b82f6;padding:7px 14px;font-size:14px;font-weight:700;flex-shrink:0" onclick="showAddAttribute()">+ Add Skill</button>
     </div>
 
     <div id="attr-form" style="display:none;margin-bottom:16px"></div>
 
-    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:10px 12px;margin-bottom:14px">
-      <div style="display:flex;gap:16px;font-size:11px;flex-wrap:wrap">
+    <div style="background:#0d1420;border:1px solid #111827;border-radius:8px;padding:10px 12px;margin-bottom:14px">
+      <div style="display:flex;gap:16px;font-size:13px;flex-wrap:wrap">
         <span style="color:#22c55e;font-weight:700">💪 S = Strength</span>
         <span style="color:#94a3b8;font-weight:700">➖ M = Mid</span>
         <span style="color:#ef4444;font-weight:700">⚠ W = Weakness → plan targets drills sharing this skill</span>
@@ -2157,15 +2316,15 @@ function renderAttributeSettings() {
     </div>
 
     <div style="display:grid;gap:7px">
-      ${skills.length===0 ? `<p style="color:#334155;font-size:12px;font-style:italic">No skills defined yet.</p>` : ''}
+      ${skills.length===0 ? `<p style="color:#1e2d45;font-size:14px;font-style:italic">No skills defined yet.</p>` : ''}
       ${skills.map(s => `
       <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px">
         <div style="flex:1">
-          <span style="color:#fff;font-size:13px;font-weight:600">${s.label}</span>
+          <span style="color:#fff;font-size:15px;font-weight:600">${s.label}</span>
 
         </div>
         <div style="display:flex;gap:5px">
-          <button class="btn" style="background:#1e293b" onclick="editAttribute('${s.id}')">Edit</button>
+          <button class="btn" style="background:#111827" onclick="editAttribute('${s.id}')">Edit</button>
           <button class="btn" style="background:#7f1d1d" onclick="deleteAttribute('${s.id}')">✕</button>
         </div>
       </div>`).join('')}
@@ -2179,19 +2338,19 @@ function renderListSettings(key, title, placeholder, description) {
   const list = settings[key] || [];
   return `
   <div>
-    <p style="color:#94a3b8;font-size:13px;margin-bottom:16px">${description}</p>
+    <p style="color:#94a3b8;font-size:15px;margin-bottom:16px">${description}</p>
     <div style="display:flex;gap:7px;margin-bottom:12px">
       <input id="list-input-${key}" placeholder="${placeholder}" style="flex:1"/>
-      <button class="btn" style="background:#e87722;padding:7px 14px;font-size:12px;font-weight:700" onclick="addListItem('${key}')">Add</button>
+      <button class="btn" style="background:#3b82f6;padding:7px 14px;font-size:14px;font-weight:700" onclick="addListItem('${key}')">Add</button>
     </div>
     <div style="display:grid;gap:6px">
       ${list.map((item,i)=>`
       <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
-        <span style="color:#e2e8f0;font-size:13px">${item}</span>
+        <span style="color:#e2e8f0;font-size:15px">${item}</span>
         <button class="btn" style="background:#7f1d1d" onclick="removeListItem('${key}',${i})">✕</button>
       </div>`).join('')}
     </div>
-    ${list.length===0?`<p style="color:#334155;font-size:12px;font-style:italic;padding:8px 0">No items yet.</p>`:''}
+    ${list.length===0?`<p style="color:#1e2d45;font-size:14px;font-style:italic;padding:8px 0">No items yet.</p>`:''}
   </div>`;
 }
 
@@ -2225,22 +2384,22 @@ function renderFocusSettings() {
   const list = settings.focusOptions || [];
   return `
   <div>
-    <p style="color:#94a3b8;font-size:13px;margin-bottom:6px">Focus areas appear on drills and drive plan generation. They also appear in the plan builder's focus selector.</p>
-    <p style="color:#e87722;font-size:12px;margin-bottom:16px">⚠ Removing a focus area will not update existing drills — those drills just won't match until updated.</p>
+    <p style="color:#94a3b8;font-size:15px;margin-bottom:6px">Focus areas appear on drills and drive plan generation. They also appear in the plan builder's focus selector.</p>
+    <p style="color:#3b82f6;font-size:14px;margin-bottom:16px">⚠ Removing a focus area will not update existing drills — those drills just won't match until updated.</p>
     <div style="display:flex;gap:7px;margin-bottom:12px">
       <input id="list-input-focusOptions" placeholder="e.g. post-play, off-ball movement"/>
-      <button class="btn" style="background:#e87722;padding:7px 14px;font-size:12px;font-weight:700" onclick="addListItem('focusOptions')">Add</button>
+      <button class="btn" style="background:#3b82f6;padding:7px 14px;font-size:14px;font-weight:700" onclick="addListItem('focusOptions')">Add</button>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:7px">
       ${list.map((item,i)=>`
-      <div style="background:rgba(232,119,34,.1);border:1px solid rgba(232,119,34,.3);border-radius:7px;padding:6px 10px;display:flex;align-items:center;gap:7px">
-        <span style="color:#e87722;font-size:12px;font-weight:600">${item}</span>
-        <button onclick="removeListItem('focusOptions',${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;padding:0;line-height:1">✕</button>
+      <div style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);border-radius:7px;padding:6px 10px;display:flex;align-items:center;gap:7px">
+        <span style="color:#3b82f6;font-size:14px;font-weight:600">${item}</span>
+        <button onclick="removeListItem('focusOptions',${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;padding:0;line-height:1">✕</button>
       </div>`).join('')}
     </div>
-    ${list.length===0?`<p style="color:#334155;font-size:12px;font-style:italic;padding:8px 0">No focus areas defined.</p>`:''}
-    <div style="margin-top:16px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px 14px">
-      <p style="color:#475569;font-size:12px;margin:0">Tip: Focus areas must match exactly what is used on drills for the plan generator to connect them. Keep labels lowercase and consistent.</p>
+    ${list.length===0?`<p style="color:#1e2d45;font-size:14px;font-style:italic;padding:8px 0">No focus areas defined.</p>`:''}
+    <div style="margin-top:16px;background:#0d1420;border:1px solid #1e2d45;border-radius:8px;padding:12px 14px">
+      <p style="color:#475569;font-size:14px;margin:0">Tip: Focus areas must match exactly what is used on drills for the plan generator to connect them. Keep labels lowercase and consistent.</p>
     </div>
   </div>`;
 }
@@ -2263,8 +2422,8 @@ function renderAttrForm() {
   if (!el) return;
   el.style.display = 'block';
   el.innerHTML = `
-  <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:18px">
-    <h3 class="condensed" style="font-size:17px;color:#e87722;margin-bottom:14px">${f._new?'New Skill':'Edit Skill'}</h3>
+  <div style="background:#0d1420;border:1px solid #1e2d45;border-radius:12px;padding:18px">
+    <h3 class="condensed" style="font-size:20px;color:#3b82f6;margin-bottom:14px">${f._new?'New Skill':'Edit Skill'}</h3>
     <div class="grid2">
       <div class="span2">
         <div class="label">Skill Label</div>
@@ -2273,8 +2432,8 @@ function renderAttrForm() {
   
     </div>
     <div style="display:flex;gap:7px;margin-top:14px">
-      <button class="btn" style="background:#e87722;padding:7px 18px;font-size:13px" onclick="saveAttribute()">Save</button>
-      <button class="btn" style="background:#334155;padding:7px 14px;font-size:13px" onclick="cancelAttr()">Cancel</button>
+      <button class="btn" style="background:#3b82f6;padding:7px 18px;font-size:15px" onclick="saveAttribute()">Save</button>
+      <button class="btn" style="background:#1e2d45;padding:7px 14px;font-size:15px" onclick="cancelAttr()">Cancel</button>
     </div>
   </div>`;
 }
